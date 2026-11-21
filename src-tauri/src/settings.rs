@@ -177,11 +177,11 @@ pub enum ShortcutActivation {
     /// Press to start, press again to stop.
     Toggle,
     /// Hold to record, release to stop.
+    #[default]
     PushToTalk,
     /// Hold to record and release to stop, or tap to keep recording until the
     /// next press. Which one it was is decided by how long the key was held
     /// (`hold_threshold_ms`).
-    #[default]
     HoldOrToggle,
 }
 
@@ -605,11 +605,11 @@ fn default_autostart_enabled() -> bool {
 }
 
 fn default_update_checks_enabled() -> bool {
-    true
+    false
 }
 
 fn default_show_whats_new_on_update() -> bool {
-    true
+    false
 }
 
 fn default_whats_new_last_seen_version() -> String {
@@ -691,7 +691,7 @@ fn default_auto_submit() -> bool {
 }
 
 fn default_history_limit() -> usize {
-    5
+    0
 }
 
 fn default_recording_retention_period() -> RecordingRetentionPeriod {

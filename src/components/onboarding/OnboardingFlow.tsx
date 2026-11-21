@@ -152,6 +152,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     // Saved only now: each login item change posts a macOS notification.
     if (!preview) {
       await updateSetting("autostart_enabled", store.atLogin);
+      await updateSetting("shortcut_activation", "push_to_talk");
       await commands.completeOnboarding();
     }
     onComplete();

@@ -2,6 +2,7 @@ import { listen } from "@tauri-apps/api/event";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
+import { LiveTranscript } from "./LiveTranscript";
 import { commands, events } from "@/bindings";
 import type {
   Notice,
@@ -113,7 +114,17 @@ const RecordingOverlay: React.FC = () => {
           setStreamText({ committed: "", tentative: "" });
         }
 
-        await syncLanguageFromSettings();
+        setState(overlayState);
+        if (overlayState === "streaming") {
+          setPhase("listening");
+          setWorkKind("transcribing");
+          setElapsed(0);
+          setLoadNoticeShown(false);
+          setSession((s) => s + 1);
+        }
+        setIsVisible(true);
+
+        void syncLanguageFromSettings();
         // The Live panel flows downward from a top overlay and upward from a
         // bottom one; read the placement so the layout can flip to match.
         try {
@@ -126,15 +137,6 @@ const RecordingOverlay: React.FC = () => {
         } catch {
           // Keep the previous/default placement if settings can't be read.
         }
-        setState(overlayState);
-        if (overlayState === "streaming") {
-          setPhase("listening");
-          setWorkKind("transcribing");
-          setElapsed(0);
-          setLoadNoticeShown(false);
-          setSession((s) => s + 1); // remount the card fresh for this session
-        }
-        setIsVisible(true);
       });
 
       const unlistenHide = await listen("hide-overlay", () => {
@@ -217,7 +219,10 @@ const RecordingOverlay: React.FC = () => {
       };
     };
 
-    setupEventListeners();
+    const subscription = setupEventListeners();
+    return () => {
+      void subscription.then((unsubscribe) => unsubscribe());
+    };
   }, []);
 
   // Elapsed capture timer starts only once microphone samples are flowing.
@@ -401,10 +406,7 @@ const RecordingOverlay: React.FC = () => {
                     </span>
                   )}
                   {noticeText && <span className="ndetail">{noticeText}</span>}
-                  <span className="committed">
-                    {streamText.committed ? streamText.committed + " " : ""}
-                  </span>
-                  <span className="tentative">{streamText.tentative}</span>
+                  <LiveTranscript {...streamText} />
                   {/* Drop the blinking caret once finalizing — it's no longer
                       capturing, and a static spinner conveys the work. */}
                   {!working && !loadingNotice && !liveNotice && (

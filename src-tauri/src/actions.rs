@@ -9,7 +9,10 @@ use crate::managers::transcription::policy::{live_decode, LiveDecode, ModelTrait
 use crate::managers::transcription::StreamWorkKind;
 use crate::managers::transcription::{Transcription, TranscriptionManager};
 use crate::notices::{self, Notice, NoticeCode, NoticeSource};
-use crate::settings::{get_settings, AppSettings, OverlayStyle, APPLE_INTELLIGENCE_PROVIDER_ID};
+use crate::settings::{
+    get_settings, AppSettings, OverlayStyle, RecordingRetentionPeriod,
+    APPLE_INTELLIGENCE_PROVIDER_ID,
+};
 use crate::shortcut;
 use crate::tray::{set_tray_state, TrayIconState};
 use crate::utils::{
@@ -719,7 +722,11 @@ impl ShortcutAction for TranscribeAction {
         // the larger panel, but it still switches from listening to a working
         // spinner while the stream finalizes. Non-streaming paths use the
         // compact transcribing pill (None no-ops in show_*).
-        let style = get_settings(app).overlay_style;
+        let settings = get_settings(app);
+        let style = settings.overlay_style;
+        let keep_audio = settings.recording_retention_period
+            != RecordingRetentionPeriod::PreserveLimit
+            || settings.history_limit > 0;
         // Capture this before finalizing the stream so every later working state
         // targets the same overlay that was shown for this transcription.
         let use_streaming_overlay = should_use_streaming_overlay(style, tm.is_streaming());
@@ -772,14 +779,17 @@ impl ShortcutAction for TranscribeAction {
                     tm.cancel_stream();
                     finish_without_text(&ah, input_silent, 0, stop_time);
                 } else {
-                    // Save WAV concurrently with transcription
                     let sample_count = samples.len();
-                    let file_name = format!("handy-{}.wav", chrono::Utc::now().timestamp());
+                    let file_name =
+                        format!("clearvoice-{}.wav", chrono::Utc::now().timestamp_millis());
                     let wav_path = hm.recordings_dir().join(&file_name);
-                    let wav_path_for_verify = wav_path.clone();
-                    let samples_for_wav = samples.clone();
-                    let wav_handle = tauri::async_runtime::spawn_blocking(move || {
-                        crate::audio_toolkit::save_wav_file(&wav_path, &samples_for_wav)
+                    let wav_handle = keep_audio.then(|| {
+                        let samples_for_wav = samples.clone();
+                        let path = wav_path.clone();
+                        tauri::async_runtime::spawn_blocking(move || {
+                            crate::audio_toolkit::save_wav_file(&path, &samples_for_wav)?;
+                            crate::audio_toolkit::verify_wav_file(&path, sample_count)
+                        })
                     });
 
                     // Transcribe concurrently with WAV save: the live decode's
@@ -789,28 +799,22 @@ impl ShortcutAction for TranscribeAction {
                     let transcription_time = Instant::now();
                     let transcription_result = tm.transcribe_recording(samples);
 
-                    // Await WAV save and verify
-                    let wav_saved = match wav_handle.await {
-                        Ok(Ok(())) => {
-                            match crate::audio_toolkit::verify_wav_file(
-                                &wav_path_for_verify,
-                                sample_count,
-                            ) {
-                                Ok(()) => true,
-                                Err(e) => {
-                                    error!("WAV verification failed: {}", e);
-                                    false
-                                }
+                    let wav_saved = if let Some(handle) = wav_handle {
+                        match handle.await {
+                            Ok(Ok(())) => true,
+                            Ok(Err(e)) => {
+                                error!("Failed to save or verify WAV file: {}", e);
+                                let _ = std::fs::remove_file(&wav_path);
+                                false
+                            }
+                            Err(e) => {
+                                error!("WAV save task panicked: {}", e);
+                                let _ = std::fs::remove_file(&wav_path);
+                                false
                             }
                         }
-                        Ok(Err(e)) => {
-                            error!("Failed to save WAV file: {}", e);
-                            false
-                        }
-                        Err(e) => {
-                            error!("WAV save task panicked: {}", e);
-                            false
-                        }
+                    } else {
+                        false
                     };
 
                     if rm.was_cancelled_since(cancel_generation) {

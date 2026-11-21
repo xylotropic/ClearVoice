@@ -5,14 +5,9 @@
   /* Near-opaque app surface (theme.css --color-background at 98%). Auto-flips
      light/dark with --color-background, so no dark-mode override is needed. */
   --s-surface: color-mix(in srgb, var(--color-background) 98%, transparent);
-  /* Accent = logo pink; flips automatically via --color-logo-primary. */
-  --s-accent: var(--color-logo-primary);
+  --s-accent: #087d71;
   /* The rest come from theme.css, which already follows the theme setting. */
-  --s-accent-soft: color-mix(
-    in srgb,
-    var(--color-logo-primary) 20%,
-    transparent
-  );
+  --s-accent-soft: color-mix(in srgb, var(--s-accent) 20%, transparent);
   --s-muted: var(--color-ink-2);
   --s-faint: var(--color-ink-3);
   --s-border: var(--color-line);
@@ -238,7 +233,8 @@
   padding-left: 14px;
   padding-right: 14px;
   font-size: 15px;
-  font-style: italic;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   line-height: 1.35;
   letter-spacing: -0.003em;
   color: var(--color-text);
@@ -257,7 +253,33 @@
   margin: auto 0 0;
 }
 .stext-cap .tentative {
-  color: inherit;
+  color: var(--s-muted);
+}
+.stext-cap .transcript-word {
+  animation: transcript-arrive 220ms ease-out both;
+  transition: color 160ms ease-out;
+}
+@keyframes transcript-arrive {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+:root[data-theme="dark"] {
+  --s-accent: #6debd4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-stage,
+  .ov-stage * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 .stext-cap .sloading {
   color: var(--s-muted);

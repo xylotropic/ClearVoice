@@ -69,7 +69,7 @@ const fresh = (): Persisted => ({
   welcomeBack: false,
   lessons: { hold: false, tap: false },
   returnTo: null,
-  atLogin: true,
+  atLogin: false,
 });
 
 const isStringList = (v: unknown): v is string[] =>
