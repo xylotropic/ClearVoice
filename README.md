@@ -1,5 +1,7 @@
 # Prism
 
+> This is the legacy ClearVoice repository. Visit the [Prism website](https://prism-dictation.vercel.app/) or the [current Prism repository](https://github.com/xylotropic/Prism).
+
 Prism is an MIT-licensed macOS dictation app based on [Handy](https://github.com/cjpais/Handy). Hold the shortcut to dictate, watch new words appear in a virtual notch at the top of your display, and release to paste the finished text once. Press Escape during recording to cancel, or click **Undo** in the notice to recover that take.
 
 [Download Prism for Apple silicon](https://prism-dictation.vercel.app/Prism-Apple-Silicon.dmg)
