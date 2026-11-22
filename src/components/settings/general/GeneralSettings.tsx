@@ -26,20 +26,23 @@ export const GeneralSettings: React.FC = () => {
     (getSetting("chinese_script") ?? "as_transcribed") !== "as_transcribed";
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
-      <SettingsGroup title={t("settings.general.title")}>
+      <SettingsGroup id="shortcuts" title={t("onboarding.done.panel.shortcut")}>
         <ShortcutInput shortcutId="transcribe" grouped={true} />
         <ShortcutActivationSetting descriptionMode="tooltip" grouped={true} />
         {/* Cancel shortcut remains hidden on Linux because of dynamic shortcut instability. */}
         {!isLinux && <ShortcutInput shortcutId="cancel" grouped={true} />}
       </SettingsGroup>
-      <SettingsGroup title={t("settings.languages.title")}>
+      <SettingsGroup
+        id="language_settings"
+        title={t("settings.languages.title")}
+      >
         <PreferredLanguages descriptionMode="tooltip" grouped={true} />
         {speaksChinese && (
           <ChineseScriptSetting descriptionMode="tooltip" grouped={true} />
         )}
       </SettingsGroup>
       <ModelSettingsCard />
-      <SettingsGroup title={t("settings.sound.title")}>
+      <SettingsGroup id="microphone_settings" title={t("settings.sound.title")}>
         <MicrophoneSelector descriptionMode="tooltip" grouped={true} />
         <ChannelSelector descriptionMode="tooltip" grouped={true} />
         <MuteWhileRecording descriptionMode="tooltip" grouped={true} />

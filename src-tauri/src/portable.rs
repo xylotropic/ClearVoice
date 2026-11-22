@@ -115,6 +115,78 @@ pub fn store_path(relative: &str) -> PathBuf {
     }
 }
 
+/// Import the earlier macOS build's local data on the first Prism launch.
+/// macOS grants Accessibility and Microphone access per app identity.
+#[cfg(target_os = "macos")]
+pub fn migrate_clearvoice_data(app: &tauri::AppHandle) -> anyhow::Result<()> {
+    if is_portable() || app.config().identifier != "io.github.xylotropic.prism" {
+        return Ok(());
+    }
+    let target = app_data_dir(app)?;
+    let legacy = target.with_file_name("io.github.xylotropic.clearvoice");
+    import_legacy_data(&legacy, &target)
+}
+
+#[cfg(target_os = "macos")]
+fn import_legacy_data(legacy: &Path, target: &Path) -> anyhow::Result<()> {
+    use std::fs;
+
+    if !legacy.is_dir() || (target.exists() && fs::read_dir(target)?.next().is_some()) {
+        return Ok(());
+    }
+    let parent = target.parent().expect("app data dir has a parent");
+    let stage = tempfile::Builder::new()
+        .prefix(".prism-import-")
+        .tempdir_in(parent)?;
+
+    for name in [
+        crate::settings::SETTINGS_STORE_PATH,
+        "recordings",
+        "models",
+        "custom_start.wav",
+        "custom_stop.wav",
+    ] {
+        let source = legacy.join(name);
+        if source.exists() {
+            copy_data_entry(&source, &stage.path().join(name))?;
+        }
+    }
+
+    let history = legacy.join("history.db");
+    if history.is_file() {
+        let db = rusqlite::Connection::open_with_flags(
+            history,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+        )?;
+        let backup = stage.path().join("history.db");
+        db.execute("VACUUM INTO ?1", [backup.to_string_lossy().as_ref()])?;
+    }
+
+    // Publish the import only after every copy succeeded. An existing
+    // nonempty target cannot be replaced by rename.
+    fs::rename(stage.path(), target)?;
+    Ok(())
+}
+
+#[cfg(target_os = "macos")]
+fn copy_data_entry(source: &Path, target: &Path) -> std::io::Result<()> {
+    use std::fs;
+
+    let kind = fs::symlink_metadata(source)?.file_type();
+    if kind.is_symlink() {
+        std::os::unix::fs::symlink(fs::read_link(source)?, target)?;
+    } else if kind.is_dir() {
+        fs::create_dir(target)?;
+        for entry in fs::read_dir(source)? {
+            let entry = entry?;
+            copy_data_entry(&entry.path(), &target.join(entry.file_name()))?;
+        }
+    } else if kind.is_file() {
+        fs::copy(source, target)?;
+    }
+    Ok(())
+}
+
 /// Check if a marker file path contains the portable magic string.
 /// Extracted for testability.
 fn is_valid_portable_marker(path: &std::path::Path) -> bool {
@@ -127,6 +199,35 @@ fn is_valid_portable_marker(path: &std::path::Path) -> bool {
 mod tests {
     use super::*;
     use std::io::Write;
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn import_keeps_history_and_does_not_replace_new_settings() {
+        let temp = tempfile::tempdir().unwrap();
+        let legacy = temp.path().join("old");
+        let target = temp.path().join("prism");
+        std::fs::create_dir(&legacy).unwrap();
+        std::fs::create_dir(&target).unwrap();
+        let history = rusqlite::Connection::open(legacy.join("history.db")).unwrap();
+        history
+            .execute_batch("PRAGMA journal_mode=WAL; CREATE TABLE history (text); INSERT INTO history VALUES ('fixture');")
+            .unwrap();
+        let key = crate::settings::SETTINGS_STORE_PATH;
+        std::fs::write(legacy.join(key), "old").unwrap();
+
+        import_legacy_data(&legacy, &target).unwrap();
+        let migrated = rusqlite::Connection::open(target.join("history.db")).unwrap();
+        let text: String = migrated
+            .query_row("SELECT text FROM history", [], |row| row.get(0))
+            .unwrap();
+        assert_eq!(text, "fixture");
+        assert_eq!(std::fs::read_to_string(target.join(key)).unwrap(), "old");
+
+        std::fs::write(target.join(key), "new").unwrap();
+        import_legacy_data(&legacy, &target).unwrap();
+        assert_eq!(std::fs::read_to_string(target.join(key)).unwrap(), "new");
+        assert_eq!(std::fs::read_to_string(legacy.join(key)).unwrap(), "old");
+    }
 
     #[test]
     fn test_valid_magic_string_enables_portable() {

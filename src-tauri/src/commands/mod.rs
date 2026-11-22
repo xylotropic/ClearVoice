@@ -203,6 +203,7 @@ pub fn complete_onboarding(app: AppHandle) -> Result<(), String> {
     let mut settings = crate::settings::get_settings(&app);
     settings.onboarding_completed = true;
     crate::settings::write_settings(&app, settings);
+    crate::tray::update_tray_menu(&app);
     Ok(())
 }
 

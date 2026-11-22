@@ -15,8 +15,6 @@
   --color-moss: var(--color-moss);
   --color-plum: var(--color-plum);
   --color-plum-pick: var(--color-plum-pick);
-  --color-demo-window: var(--color-demo-window);
-  --color-mascot-line: var(--color-mascot-line);
   --color-wash: var(--color-wash);
   --color-moss-wash: var(--color-moss-wash);
   --color-warning-wash: var(--color-warning-wash);
@@ -36,20 +34,25 @@
   font-display: block;
 }
 
+@font-face {
+  font-family: Inter;
+  src: url("./assets/fonts/inter.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 /* Onboarding's scale in px (rem steps land on fractions at a 15px root).
    Names avoid Tailwind's defaults, which Settings still uses. */
 @theme {
-  --font-display:
-    ui-rounded, "SF Pro Rounded", system-ui, -apple-system,
-    "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  --font-display: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-ui:
-    system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto,
-    "Noto Sans", sans-serif;
+    Inter, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI",
+    Roboto, "Noto Sans", sans-serif;
   --font-cjk-subset:
     "Handy CJK Subset", -apple-system, "Segoe UI Variable Text", "Segoe UI",
     system-ui, sans-serif;
 
-  --text-title: 26px; /* screen titles */
+  --text-title: 30px; /* screen titles */
   --text-name: 15px; /* the model name on Model's Full card */
   --text-row: 17px; /* row titles */
   --text-body: 15px; /* body, subtitles */
@@ -70,11 +73,6 @@
 
   --ease-glide: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* The mascot waves once on arrival (it rests tilted -8deg) */
-  --animate-wave: wave 1100ms var(--ease-glide) 250ms both;
-  /* A high five: lunge, squash, settle; the burst over it */
-  --animate-slap: slap 420ms var(--ease-glide);
-  --animate-burst: burst 420ms var(--ease-glide);
   /* Something new rises into place */
   --animate-rise: rise 260ms var(--ease-glide);
   /* A menu drops open from its button */
@@ -84,59 +82,6 @@
   /* A shortcut being captured: the empty slot's dashed edge breathes */
   --animate-key-slot: key-slot 1.2s ease-in-out infinite;
 
-  @keyframes wave {
-    0% {
-      rotate: -8deg;
-    }
-    20% {
-      rotate: 10deg;
-    }
-    40% {
-      rotate: -14deg;
-    }
-    60% {
-      rotate: 8deg;
-    }
-    80% {
-      rotate: -10deg;
-    }
-    100% {
-      rotate: -8deg;
-    }
-  }
-  @keyframes slap {
-    0% {
-      rotate: -8deg;
-      scale: 1;
-    }
-    30% {
-      rotate: 4deg;
-      scale: 1.16 1.08;
-    }
-    45% {
-      rotate: 2deg;
-      scale: 0.94 1.02;
-    }
-    100% {
-      rotate: -8deg;
-      scale: 1;
-    }
-  }
-  @keyframes burst {
-    0% {
-      opacity: 0;
-      scale: 0.6;
-    }
-    25% {
-      opacity: 1;
-      scale: 1.1;
-    }
-    100% {
-      opacity: 0;
-      scale: 1.3;
-      translate: 0 -6px;
-    }
-  }
   @keyframes fade {
     from {
       opacity: 0;
@@ -175,6 +120,7 @@
 
 :root {
   /* Typography */
+  font-family: var(--font-ui);
   font-size: 15px;
   line-height: 24px;
   font-weight: 400;
@@ -212,6 +158,31 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
+}
+
+[data-onboarding] {
+  color-scheme: light;
+}
+
+.prism-artwork {
+  mix-blend-mode: multiply;
+  mask-image: linear-gradient(to right, transparent, #000 8% 92%, transparent);
+}
+
+.prism-primary {
+  background-image: linear-gradient(#247ae9, var(--color-background-ui));
+  box-shadow:
+    inset 0 1px 0 #ffffff32,
+    0 2px 4px #164f9a19;
+}
+
+.prism-primary:hover {
+  background-image: linear-gradient(#216ed1, #104fac);
+}
+
+.prism-primary:disabled {
+  background-image: none;
+  box-shadow: none;
 }
 
 .container {

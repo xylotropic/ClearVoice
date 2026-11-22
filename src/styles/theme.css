@@ -2,20 +2,19 @@
  * greys (ink-2, ink-3, line-strong, line, wash) for text, edges and fills;
  * logo-primary / background-ui for brand and primary actions; plum for keys
  * and picks (onboarding); moss / warning / error (+ -wash) for status.
- * demo-*, wordmark and mascot are illustration, not UI.
  */
 
 :root {
   /* Palette source of truth. Each themed color is defined once as a
      light/dark pair; the active tokens below and the `data-theme` overrides
      in App.css reference these, so a hex value lives in exactly one place. */
-  --light-color-text: #0f0f0f;
-  --light-color-background: #f8faff;
+  --light-color-text: #121212;
+  --light-color-background: #ffffff;
   --light-color-logo-primary: #8ec6ff;
   --light-color-logo-stroke: #153562;
 
   --dark-color-text: #f8faff;
-  --dark-color-background: #141e31;
+  --dark-color-background: #15171b;
   --dark-color-logo-primary: #69aeff;
 
   /* Status colors. Each has a -wash tint below. */
@@ -29,48 +28,8 @@
   --dark-color-moss: #86c9a4;
 
   /* Plum: the ink for keycaps and picked items. */
-  --light-color-plum: var(--light-color-logo-stroke);
+  --light-color-plum: #153c75;
   --dark-color-plum: var(--dark-color-text);
-
-  /* Demo's drawn app window. */
-  --light-color-demo-window: var(--light-color-background);
-  --dark-color-demo-window: color-mix(
-    in srgb,
-    #fff 4%,
-    var(--dark-color-background)
-  );
-
-  /* Demo's laptop: lid, base gradient and wallpaper. */
-  --light-color-demo-lid: #1f1e21;
-  --dark-color-demo-lid: #0f0e10;
-  --light-color-demo-alu-hi: #ececee;
-  --dark-color-demo-alu-hi: #5a585d;
-  --light-color-demo-alu-lo: #cdccd1;
-  --dark-color-demo-alu-lo: #3b3a3e;
-  --light-demo-wallpaper:
-    radial-gradient(
-      110% 80% at 90% 105%,
-      color-mix(in srgb, var(--light-color-logo-primary) 50%, #f8faff) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      90% 80% at 5% -5%,
-      color-mix(in srgb, #b6d8ff 55%, #f8faff) 0%,
-      transparent 62%
-    ),
-    color-mix(in srgb, #e5eefc 60%, #f8faff);
-  --dark-demo-wallpaper:
-    radial-gradient(
-      110% 80% at 90% 105%,
-      color-mix(in srgb, var(--dark-color-logo-primary) 26%, #111a30) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      90% 80% at 5% -5%,
-      color-mix(in srgb, #3964ad 38%, #111a30) 0%,
-      transparent 62%
-    ),
-    #131e34;
 
   /* The wordmark. Dark mode outlines it in white to keep the wordmark legible. */
   --light-color-wordmark: var(--light-color-logo-primary);
@@ -78,20 +37,6 @@
   --dark-color-wordmark: var(--dark-color-logo-primary);
   --dark-color-wordmark-stroke: var(--dark-color-text);
 
-  /* Mascot outline and face; dark mode uses the background, not muddy plum. */
-  --light-color-mascot-line: var(--light-color-logo-stroke);
-  --dark-color-mascot-line: var(--dark-color-background);
-
-  /* Demo's recording pill ring and shadow. */
-  --light-demo-pill-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-background-ui) 16%, transparent),
-    0 10px 26px -10px rgba(0, 0, 0, 0.35);
-  --dark-demo-pill-shadow:
-    0 0 0 1px
-      color-mix(in srgb, var(--dark-color-logo-primary) 20%, transparent),
-    0 10px 26px -10px rgba(0, 0, 0, 0.6);
-
-  /* Status tints for the box behind a status color. */
   --light-color-moss-wash: color-mix(
     in srgb,
     var(--light-color-moss) 12%,
@@ -124,8 +69,11 @@
   );
 
   /* Tokens that do not change between light and dark */
-  --color-background-ui: #2478e4;
-  --color-mid-gray: #808080;
+  --color-background-ui: #135fd6;
+  --light-color-quiet: #687180;
+  --light-color-line: #e2e9f2;
+  --light-color-line-strong: #b9c6d8;
+  --light-color-wash: #f4f7fb;
 
   /* Active palette — defaults to light, follows the OS via the media query
      below, or is forced by `data-theme` (see the overrides below). */
@@ -136,29 +84,18 @@
   --color-error: var(--light-color-error);
   --color-moss: var(--light-color-moss);
   --color-plum: var(--light-color-plum);
-  --demo-pill-shadow: var(--light-demo-pill-shadow);
-  --color-demo-window: var(--light-color-demo-window);
-  --color-demo-lid: var(--light-color-demo-lid);
-  --color-demo-alu-hi: var(--light-color-demo-alu-hi);
-  --color-demo-alu-lo: var(--light-color-demo-alu-lo);
-  --demo-wallpaper: var(--light-demo-wallpaper);
   --color-wordmark: var(--light-color-wordmark);
   --color-wordmark-stroke: var(--light-color-wordmark-stroke);
-  --color-mascot-line: var(--light-color-mascot-line);
   --color-moss-wash: var(--light-color-moss-wash);
   --color-warning-wash: var(--light-color-warning-wash);
   --color-error-wash: var(--light-color-error-wash);
 
   /* Grey steps: secondary text, hints/icons, control edges, dividers, hover fill. */
   --color-ink-2: color-mix(in srgb, var(--color-text) 60%, transparent);
-  --color-ink-3: var(--color-mid-gray);
-  --color-line-strong: color-mix(
-    in srgb,
-    var(--color-mid-gray) 80%,
-    transparent
-  );
-  --color-line: color-mix(in srgb, var(--color-mid-gray) 20%, transparent);
-  --color-wash: color-mix(in srgb, var(--color-mid-gray) 10%, transparent);
+  --color-ink-3: var(--light-color-quiet);
+  --color-line-strong: var(--light-color-line-strong);
+  --color-line: var(--light-color-line);
+  --color-wash: var(--light-color-wash);
   /* Edge of a picked card or option. */
   --color-plum-pick: color-mix(in srgb, var(--color-plum) 60%, transparent);
   /* The far end of a capture slot's breathing edge (KeySlot). */
@@ -167,6 +104,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --color-ink-3: #a6afbd;
+    --color-line-strong: #4d5665;
+    --color-line: #303642;
+    --color-wash: #20252e;
     --color-text: var(--dark-color-text);
     --color-background: var(--dark-color-background);
     --color-logo-primary: var(--dark-color-logo-primary);
@@ -174,15 +115,8 @@
     --color-error: var(--dark-color-error);
     --color-moss: var(--dark-color-moss);
     --color-plum: var(--dark-color-plum);
-    --demo-pill-shadow: var(--dark-demo-pill-shadow);
-    --color-demo-window: var(--dark-color-demo-window);
-    --color-demo-lid: var(--dark-color-demo-lid);
-    --color-demo-alu-hi: var(--dark-color-demo-alu-hi);
-    --color-demo-alu-lo: var(--dark-color-demo-alu-lo);
-    --demo-wallpaper: var(--dark-demo-wallpaper);
     --color-wordmark: var(--dark-color-wordmark);
     --color-wordmark-stroke: var(--dark-color-wordmark-stroke);
-    --color-mascot-line: var(--dark-color-mascot-line);
     --color-moss-wash: var(--dark-color-moss-wash);
     --color-warning-wash: var(--dark-color-warning-wash);
     --color-error-wash: var(--dark-color-error-wash);
@@ -199,7 +133,22 @@
  * Lives here (not in App.css) so every window that imports the shared palette —
  * the settings window and the recording overlay alike — honours the override.
  */
-:root[data-theme="light"] {
+:root[data-theme="light"],
+:root [data-onboarding] {
+  --color-ink-3: var(--light-color-quiet);
+  --color-line-strong: var(--light-color-line-strong);
+  --color-line: var(--light-color-line);
+  --color-wash: var(--light-color-wash);
+  --color-plum-pick: color-mix(
+    in srgb,
+    var(--light-color-plum) 60%,
+    transparent
+  );
+  --color-plum-faint: color-mix(
+    in srgb,
+    var(--light-color-plum) 22%,
+    transparent
+  );
   --color-text: var(--light-color-text);
   --color-background: var(--light-color-background);
   --color-logo-primary: var(--light-color-logo-primary);
@@ -207,21 +156,18 @@
   --color-error: var(--light-color-error);
   --color-moss: var(--light-color-moss);
   --color-plum: var(--light-color-plum);
-  --demo-pill-shadow: var(--light-demo-pill-shadow);
-  --color-demo-window: var(--light-color-demo-window);
-  --color-demo-lid: var(--light-color-demo-lid);
-  --color-demo-alu-hi: var(--light-color-demo-alu-hi);
-  --color-demo-alu-lo: var(--light-color-demo-alu-lo);
-  --demo-wallpaper: var(--light-demo-wallpaper);
   --color-wordmark: var(--light-color-wordmark);
   --color-wordmark-stroke: var(--light-color-wordmark-stroke);
-  --color-mascot-line: var(--light-color-mascot-line);
   --color-moss-wash: var(--light-color-moss-wash);
   --color-warning-wash: var(--light-color-warning-wash);
   --color-error-wash: var(--light-color-error-wash);
 }
 
 :root[data-theme="dark"] {
+  --color-ink-3: #a6afbd;
+  --color-line-strong: #4d5665;
+  --color-line: #303642;
+  --color-wash: #20252e;
   --color-text: var(--dark-color-text);
   --color-background: var(--dark-color-background);
   --color-logo-primary: var(--dark-color-logo-primary);
@@ -229,15 +175,8 @@
   --color-error: var(--dark-color-error);
   --color-moss: var(--dark-color-moss);
   --color-plum: var(--dark-color-plum);
-  --demo-pill-shadow: var(--dark-demo-pill-shadow);
-  --color-demo-window: var(--dark-color-demo-window);
-  --color-demo-lid: var(--dark-color-demo-lid);
-  --color-demo-alu-hi: var(--dark-color-demo-alu-hi);
-  --color-demo-alu-lo: var(--dark-color-demo-alu-lo);
-  --demo-wallpaper: var(--dark-demo-wallpaper);
   --color-wordmark: var(--dark-color-wordmark);
   --color-wordmark-stroke: var(--dark-color-wordmark-stroke);
-  --color-mascot-line: var(--dark-color-mascot-line);
   --color-moss-wash: var(--dark-color-moss-wash);
   --color-warning-wash: var(--dark-color-warning-wash);
   --color-error-wash: var(--dark-color-error-wash);

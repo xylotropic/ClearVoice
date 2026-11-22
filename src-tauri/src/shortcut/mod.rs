@@ -694,6 +694,7 @@ pub fn change_translate_to_english_setting(app: AppHandle, enabled: bool) -> Res
     let mut settings = settings::get_settings(&app);
     settings.translate_to_english = enabled;
     settings::write_settings(&app, settings);
+    tray::update_tray_menu(&app);
     Ok(())
 }
 

@@ -708,7 +708,7 @@ fn default_sound_theme() -> SoundTheme {
 }
 
 fn default_theme() -> Theme {
-    Theme::System
+    Theme::Light
 }
 
 fn default_post_process_enabled() -> bool {
@@ -1549,10 +1549,8 @@ mod tests {
     fn empty_store_parses_with_defaults() {
         let settings: AppSettings = serde_json::from_value(serde_json::json!({}))
             .expect("all AppSettings fields need serde defaults");
-        assert_eq!(
-            settings.shortcut_activation,
-            ShortcutActivation::HoldOrToggle
-        );
+        assert_eq!(settings.shortcut_activation, ShortcutActivation::PushToTalk);
+        assert_eq!(settings.theme, Theme::Light);
         assert_eq!(settings.hold_threshold_ms, default_hold_threshold_ms());
         assert!(!settings.audio_feedback);
         assert!(settings.filler_word_removal_enabled);
@@ -2002,15 +2000,12 @@ mod tests {
     }
 
     #[test]
-    fn shortcut_activation_defaults_to_hold_or_toggle_without_legacy_key() {
+    fn shortcut_activation_defaults_to_push_to_talk_without_legacy_key() {
         let mut settings = get_default_settings();
         let raw = serde_json::json!({ "selected_model": "" });
 
         apply_settings_migrations(&mut settings, &raw);
-        assert_eq!(
-            settings.shortcut_activation,
-            ShortcutActivation::HoldOrToggle
-        );
+        assert_eq!(settings.shortcut_activation, ShortcutActivation::PushToTalk);
     }
 
     #[test]

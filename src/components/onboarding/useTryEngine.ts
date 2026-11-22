@@ -45,14 +45,11 @@ export const useTryEngine = ({ os }: { os: OSType }) => {
   const shortcut = getSetting("bindings")?.transcribe?.current_binding ?? "";
   const threshold = getSetting("hold_threshold_ms") ?? 300;
 
-  const todo = WAYS.find((w) => !lessons[w]);
-
   /** The current take's way, once known. */
   const [take, setTake] = useState<Mode | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [recordDown, setRecordDown] = useState(false);
   const [result, setResult] = useState<TakeResult>({ kind: "none" });
-  const [fives, setFives] = useState(0);
   /** Wait of the last take that was too slow for this model. */
   const [slowWait, setSlowWait] = useState<number | null>(null);
   const [waiting, setWaiting] = useState(false);
@@ -198,12 +195,10 @@ export const useTryEngine = ({ os }: { os: OSType }) => {
           setResult({ kind: "none" });
           return;
         }
-        // The finale does its own high five, so no fives++ here.
         if (!WAYS.some((w) => w !== way && !before[w])) {
           setResult({ kind: "finale" });
           return;
         }
-        setFives((n) => n + 1);
         setResult({ kind: "done", way });
         resultTimer.current = setTimeout(
           () => setResult({ kind: "none" }),
@@ -242,7 +237,6 @@ export const useTryEngine = ({ os }: { os: OSType }) => {
   return {
     shortcut,
     lessons,
-    todo,
     take,
     phase,
     waiting,
@@ -250,9 +244,7 @@ export const useTryEngine = ({ os }: { os: OSType }) => {
     result,
     dismiss: () => setResult({ kind: "none" }),
     slowWait,
-    fives,
     capture,
-    slap: () => setFives((n) => n + 1),
     field,
   };
 };

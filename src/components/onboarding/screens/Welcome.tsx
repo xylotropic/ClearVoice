@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../ui/Button";
 import { Radio } from "../../ui/Radio";
-import { Mascot } from "../../shared/Mascot";
+import optics from "@/assets/prism-optics.webp";
 import {
   LanguageOptions,
   LanguageSearchField,
   useLanguagePicker,
 } from "../../shared/LanguagePicker";
-import PrismWordmark from "../../icons/PrismWordmark";
 import { OnboardingShell, ScreenHeader } from "../OnboardingShell";
 import { AppLanguageMenu } from "../AppLanguageMenu";
 import { useOnboardingStore } from "../onboardingStore";
@@ -18,9 +17,6 @@ import { modelMatchesLanguage } from "@handy-computer/models";
 import { getSupportedLanguage } from "@/i18n";
 import { languageList } from "@/lib/constants/languages";
 import { useSettings } from "@/hooks/useSettings";
-
-// The mascot waves on the first visit only.
-let waved = false;
 
 interface WelcomeProps {
   progress: { index: number; count: number };
@@ -45,15 +41,7 @@ export const Welcome: React.FC<WelcomeProps> = ({ progress, onContinue }) => {
       });
     },
   });
-  const [wave] = useState(() => !waved);
-  useEffect(() => {
-    waved = true;
-    const id = setTimeout(
-      () => picker.inputRef.current?.focus({ preventScroll: true }),
-      50,
-    );
-    return () => clearTimeout(id);
-  }, []);
+  const [searching, setSearching] = useState(false);
 
   const ui = i18n.language;
   const chinese = languages.filter(isChinese);
@@ -92,35 +80,51 @@ export const Welcome: React.FC<WelcomeProps> = ({ progress, onContinue }) => {
         </Button>
       }
     >
-      <div className="flex h-full min-h-0 flex-col items-center px-gutter pt-[6px] pb-[4px] text-center">
-        <div className="mb-[10px] inline-flex items-end gap-[8px] leading-none">
-          <Mascot size={54} animation={wave ? "wave" : null} />
-          <PrismWordmark width={112} className="mb-[4px] block" />
-        </div>
+      <div className="flex h-full min-h-0 flex-col items-center justify-center-safe overflow-y-auto px-gutter py-3 text-center">
+        <img
+          src={optics}
+          alt=""
+          width={1280}
+          height={720}
+          className={`prism-artwork w-72 shrink-0 object-contain transition-[height] duration-300 ${searching ? "h-24" : "h-40"}`}
+        />
         <ScreenHeader
           title={t("onboarding.welcome.title")}
           sub={t("onboarding.welcome.subtitle")}
         />
 
-        <div className="mt-lead flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-panel border-[1.5px] border-line-strong bg-background">
+        <div
+          className="mt-lead flex min-h-[50px] w-full max-w-[520px] flex-col overflow-hidden rounded-card border border-line-strong bg-background focus-within:border-background-ui focus-within:ring-2 focus-within:ring-logo-primary/30"
+          onFocus={() => setSearching(true)}
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget))
+              setSearching(false);
+          }}
+        >
           <LanguageSearchField
             picker={picker}
-            className="border-b border-line"
             inputClassName="min-w-[120px] text-body"
+            aria-expanded={searching}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") event.currentTarget.blur();
+              else picker.onKeyDown(event);
+            }}
           />
-          <div
-            role="group"
-            aria-label={t("onboarding.welcome.languagesLabel")}
-            className="grid min-h-0 flex-1 grid-cols-3 content-start gap-[2px] overflow-y-auto p-[6px] pb-[14px] text-start [mask-image:linear-gradient(to_bottom,black_calc(100%-40px),transparent_calc(100%-6px))]"
-          >
-            <LanguageOptions
-              picker={picker}
-              noMatch={t("onboarding.welcome.noMatch", {
-                query: picker.query,
-              })}
-              emptyClassName="p-[24px]"
-            />
-          </div>
+          {searching && (
+            <div
+              role="group"
+              aria-label={t("onboarding.welcome.languagesLabel")}
+              className="grid max-h-32 min-h-16 grid-cols-3 content-start gap-0.5 overflow-y-auto border-t border-line p-1.5 text-start"
+            >
+              <LanguageOptions
+                picker={picker}
+                noMatch={t("onboarding.welcome.noMatch", {
+                  query: picker.query,
+                })}
+                emptyClassName="p-[24px]"
+              />
+            </div>
+          )}
         </div>
 
         {chinese.length > 0 && (

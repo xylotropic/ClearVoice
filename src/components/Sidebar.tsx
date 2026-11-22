@@ -100,9 +100,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     .map(([id, config]) => ({ id: id as SidebarSection, ...config }));
 
   return (
-    <div className="flex flex-col w-40 h-full border-e border-line items-center px-2 bg-logo-primary/8">
-      <PrismWordmark width={120} className="mx-4 my-5" />
-      <div className="flex flex-col w-full items-center gap-1 pt-2 border-t border-line">
+    <nav className="flex h-full w-[168px] shrink-0 flex-col border-e border-line bg-wash px-3">
+      <PrismWordmark className="mx-2 my-6" />
+      <div className="flex w-full flex-col items-center gap-1">
         {availableSections.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
@@ -112,14 +112,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
               type="button"
               aria-current={isActive ? "page" : undefined}
               key={section.id}
-              className={`flex gap-2 items-center p-2 w-full rounded-lg border border-transparent text-start cursor-pointer transition-colors focus-visible:outline-2 focus-visible:outline-logo-primary ${
+              className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-start transition-colors focus-visible:outline-2 focus-visible:outline-logo-primary ${
                 isActive
-                  ? "bg-logo-primary/24 border-logo-primary/30 font-semibold text-plum"
-                  : "hover:bg-line hover:opacity-100 opacity-85"
+                  ? "border-logo-primary/35 bg-logo-primary/20 font-semibold text-plum"
+                  : "text-ink-2 hover:bg-line hover:text-text"
               }`}
               onClick={() => onSectionChange(section.id)}
             >
-              <Icon width={19} height={19} className="shrink-0" />
+              <Icon
+                width={16}
+                height={16}
+                strokeWidth={1.75}
+                className="shrink-0"
+                aria-hidden="true"
+              />
               <p
                 className="text-sm font-medium truncate"
                 title={t(section.labelKey)}
@@ -130,6 +136,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 };

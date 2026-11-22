@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { listen } from "@tauri-apps/api/event";
 import { platform } from "@tauri-apps/plugin-os";
 import {
   checkAccessibilityPermission,
@@ -26,6 +27,7 @@ import {
   type OnboardingStep as OnboardingPreviewStep,
 } from "./components/onboarding/onboardingStore";
 import { DebugSettings, ModelsSettings } from "./components/settings";
+import { pickAndTranscribeFiles } from "./components/settings/history/transcribeFiles";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { FileDropOverlay } from "./components/FileDropOverlay";
 import { Sidebar, SidebarSection, SECTIONS_CONFIG } from "./components/Sidebar";
@@ -35,6 +37,7 @@ import { useSettingsStore } from "./stores/settingsStore";
 import { commands } from "@/bindings";
 import { deleteRetiredModel } from "@/lib/models/retired";
 import { NoticePanel } from "@/components/notices/NoticePanel";
+import { notify } from "@/stores/noticeStore";
 import { getLanguageDirection, initializeRTL } from "@/lib/utils/rtl";
 
 // flow is first-run onboarding; the rest are single screens for returning users.
@@ -44,6 +47,19 @@ type OnboardingStep =
   | "migration"
   | "replaceModel"
   | "done";
+
+const TRAY_SECTIONS = {
+  settings: "general",
+  shortcuts: "general",
+  language_settings: "general",
+  microphone_settings: "general",
+  models: "models",
+  history: "history",
+  transcribe_file: "history",
+  about: "about",
+} as const satisfies Record<string, SidebarSection>;
+
+type TrayAction = keyof typeof TRAY_SECTIONS;
 
 const renderSettingsContent = (
   section: SidebarSection,
@@ -84,6 +100,7 @@ function App() {
   const [migrationModelId, setMigrationModelId] = useState<string | null>(null);
   const [currentSection, setCurrentSection] =
     useState<SidebarSection>("general");
+  const [trayAction, setTrayAction] = useState<TrayAction | null>(null);
   const showHistory = useCallback(() => setCurrentSection("history"), []);
   const { settings, updateSetting } = useSettings();
   const direction = getLanguageDirection(i18n.language);
@@ -99,6 +116,45 @@ function App() {
   useLayoutEffect(() => {
     settingsScrollRef.current?.scrollTo({ top: 0 });
   }, [currentSection]);
+
+  useEffect(() => {
+    const unlisten = listen<TrayAction>("tray-action", ({ payload }) => {
+      if (Object.prototype.hasOwnProperty.call(TRAY_SECTIONS, payload)) {
+        setTrayAction(payload);
+      }
+    });
+    void unlisten.catch((err) =>
+      console.warn("Could not connect menu actions", err),
+    );
+    return () => {
+      void unlisten.then(
+        (remove) => remove(),
+        () => {},
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!trayAction || onboardingStep !== "done") return;
+    const section = TRAY_SECTIONS[trayAction];
+    if (currentSection !== section || onboardingPreview) {
+      setOnboardingPreview(null);
+      setCurrentSection(section);
+      return;
+    }
+
+    setTrayAction(null);
+    if (trayAction === "transcribe_file") {
+      void pickAndTranscribeFiles().catch((err) => {
+        console.error("Failed to pick a file to transcribe:", err);
+        notify({ title: t("settings.history.transcribeFailed") });
+      });
+    } else {
+      const destination = document.getElementById(trayAction);
+      if (destination) destination.scrollIntoView({ block: "start" });
+      else settingsScrollRef.current?.scrollTo({ top: 0 });
+    }
+  }, [trayAction, onboardingStep, onboardingPreview, currentSection, t]);
 
   useEffect(() => {
     checkOnboardingStatus();
@@ -335,8 +391,13 @@ function App() {
             <div ref={settingsScrollRef} className="flex-1 overflow-y-auto">
               {/* Models fills the window: its table scrolls, not the page. */}
               <div
-                className={`flex flex-col items-center p-4 gap-4 ${currentSection === "models" ? "h-full" : ""}`}
+                className={`flex flex-col items-center gap-5 px-6 py-5 ${currentSection === "models" ? "h-full" : ""}`}
               >
+                {currentSection === "general" && (
+                  <h1 className="mx-auto w-full max-w-3xl font-display text-[30px] font-[680] leading-tight tracking-[-0.045em]">
+                    {t("settings.general.title")}
+                  </h1>
+                )}
                 <SecureInputWarning />
                 {renderSettingsContent(
                   currentSection,

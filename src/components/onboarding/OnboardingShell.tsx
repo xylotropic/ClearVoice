@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import PrismWordmark from "../icons/PrismWordmark";
 
 interface OnboardingShellProps {
   /** Where this screen is in the flow; no dashes on a standalone screen. */
@@ -33,39 +34,41 @@ export const OnboardingShell: React.FC<OnboardingShellProps> = ({
       data-onboarding=""
       className="h-screen w-full flex overflow-hidden bg-background select-none cursor-default"
     >
-      {/* Disabled buttons go neutral so the only pink one is the next step.
-          The column is capped so a long row truncates instead of widening. */}
-      <div className="relative m-auto grid h-[600px] w-[720px] shrink-0 grid-cols-[minmax(0,1fr)] grid-rows-[48px_1fr_76px] font-ui text-body leading-[1.6] text-text antialiased [&_button:disabled]:border-line [&_button:disabled]:bg-wash [&_button:disabled]:text-ink-3 [&_button:disabled]:opacity-100">
-        <div className="relative flex items-center justify-between ps-[28px] pe-[20px]">
-          {progress ? (
-            <div
-              className="flex gap-[6px]"
-              role="img"
-              aria-label={t("onboarding.shell.progress", {
-                step: progress.index + 1,
-                count: progress.count,
-              })}
-            >
-              {Array.from({ length: progress.count }, (_, i) => (
-                <i
-                  key={i}
-                  className={`h-[4px] rounded-[2px] transition-[width,background-color] duration-300 ease-glide ${
-                    i === progress.index
-                      ? "w-[28px] bg-background-ui"
-                      : i < progress.index
-                        ? "w-[14px] bg-ink-3"
-                        : "w-[14px] bg-line"
-                  }`}
-                />
-              ))}
-            </div>
-          ) : (
-            <span />
-          )}
-          {pill}
-        </div>
+      <div className="relative m-auto grid h-full max-h-[600px] w-full max-w-[720px] grid-cols-[minmax(0,1fr)] grid-rows-[56px_minmax(0,1fr)_70px] font-ui text-body leading-[1.6] text-text antialiased [&_button:disabled]:border-line [&_button:disabled]:bg-wash [&_button:disabled]:text-ink-3 [&_button:disabled]:opacity-100">
+        <header className="flex items-center justify-between gap-4 px-7">
+          <PrismWordmark />
+          <div className="flex items-center gap-5">
+            {progress && (
+              <div
+                className="flex gap-1.5"
+                role="progressbar"
+                aria-label={t("onboarding.shell.progress", {
+                  step: progress.index + 1,
+                  count: progress.count,
+                })}
+                aria-valuemin={1}
+                aria-valuemax={progress.count}
+                aria-valuenow={progress.index + 1}
+              >
+                {Array.from({ length: progress.count }, (_, i) => (
+                  <i
+                    key={i}
+                    className={`h-[4px] rounded-[2px] transition-[width,background-color] duration-300 ease-glide ${
+                      i === progress.index
+                        ? "w-6 bg-background-ui"
+                        : i < progress.index
+                          ? "w-2.5 bg-logo-primary"
+                          : "w-2.5 bg-line"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+            {pill}
+          </div>
+        </header>
         <div className="min-h-0">{children}</div>
-        <div className="flex items-center justify-between gap-[16px] px-[28px] pb-[4px]">
+        <div className="flex items-center justify-between gap-4 border-t border-line px-7">
           {left ??
             (onBack ? (
               <button
@@ -163,7 +166,7 @@ export const ScreenTitle: React.FC<{
   className?: string;
 }> = ({ children, className = "" }) => (
   <h1
-    className={`m-0 font-display leading-[1.15] tracking-[-0.015em] text-balance text-title font-[650] ${className}`}
+    className={`m-0 text-balance font-display text-title leading-[1.1] font-[680] tracking-[-0.04em] ${className}`}
   >
     {children}
   </h1>

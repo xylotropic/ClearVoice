@@ -296,6 +296,21 @@ fn generate_tray_translations() {
         let parsed: serde_json::Value = serde_json::from_str(&content).unwrap();
 
         if let Some(mut tray) = parsed.get("tray").cloned() {
+            for (key, path) in [
+                ("about", "/sidebar/about"),
+                ("history", "/sidebar/history"),
+                ("microphone", "/settings/sound/microphone/title"),
+                ("shortcuts", "/settings/general/shortcut/title"),
+                ("transcribeFile", "/settings/history/transcribeFile"),
+                (
+                    "translateToEnglish",
+                    "/settings/advanced/translateToEnglish/label",
+                ),
+            ] {
+                if let Some(value) = parsed.pointer(path) {
+                    tray[key] = value.clone();
+                }
+            }
             let titles = parsed
                 .get("errors")
                 .and_then(|errors| errors.as_object())

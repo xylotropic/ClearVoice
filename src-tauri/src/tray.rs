@@ -20,6 +20,7 @@
 //! a hidden tray relies on tray-icon recreating it from the last applied
 //! icon/menu/tooltip, so those must only ever be set through the applier.
 
+use crate::commands::audio::AudioDevice;
 use crate::managers::history::{HistoryEntry, HistoryManager};
 use crate::managers::model::{ModelInfo, ModelManager};
 use crate::managers::transcription::TranscriptionManager;
@@ -32,7 +33,9 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Instant;
 use tauri::image::Image;
-use tauri::menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem, Submenu};
+use tauri::menu::{
+    CheckMenuItem, IconMenuItem, Menu, MenuItem, NativeIcon, PredefinedMenuItem, Submenu,
+};
 use tauri::tray::TrayIcon;
 use tauri::{AppHandle, Manager, Theme};
 use tauri_plugin_clipboard_manager::ClipboardExt;
@@ -72,6 +75,10 @@ struct MenuInputs {
     update_checks_enabled: bool,
     /// The language submenu, when the selected model has languages to pick.
     language: Option<LanguageMenu>,
+    selected_microphone: Option<String>,
+    microphones: Vec<(String, String)>,
+    translate_to_english: Option<bool>,
+    setup_complete: bool,
 }
 
 /// What the language submenu shows: `(code, name)` entries, with codes as
@@ -113,6 +120,7 @@ struct TrayInner {
     pending: bool,
     /// Decoded icons by resource path so the main thread never touches disk.
     icons: HashMap<&'static str, Image<'static>>,
+    microphones: Vec<(String, String)>,
     /// Handed out to each sync request in trigger order, so a slow request
     /// can't overwrite the snapshot of one that was triggered after it.
     next_seq: u64,
@@ -132,6 +140,7 @@ impl TrayState {
             applied_menu: None,
             pending: false,
             icons: HashMap::new(),
+            microphones: Vec::new(),
             next_seq: 0,
             desired_seq: 0,
         }))
@@ -262,6 +271,42 @@ pub fn update_tray_menu(app: &AppHandle) {
     sync_tray(app);
 }
 
+/// Device enumeration runs off the main thread and outside the recording path.
+pub fn set_microphones(app: &AppHandle, devices: &[AudioDevice]) {
+    let Some(state) = app.try_state::<TrayState>() else {
+        return;
+    };
+    let mut microphones = Vec::new();
+    for device in devices {
+        let value = if device.is_default {
+            "default"
+        } else {
+            &device.name
+        };
+        if !microphones.iter().any(|(id, _)| id == value) {
+            microphones.push((value.to_string(), device.name.clone()));
+        }
+    }
+    {
+        let mut inner = state.lock();
+        if inner.microphones == microphones {
+            return;
+        }
+        inner.microphones = microphones;
+    }
+    sync_tray(app);
+}
+
+#[cfg(target_os = "macos")]
+pub fn refresh_microphones(app: &AppHandle) {
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        if let Err(err) = crate::commands::audio::get_available_microphones(app).await {
+            debug!("Could not refresh microphones for the menu: {err}");
+        }
+    });
+}
+
 /// Rebuild the menu even if nothing it shows changed: clicking a check item
 /// toggles it natively, so re-picking the active one would leave it unchecked.
 pub fn rebuild_tray_menu(app: &AppHandle) {
@@ -367,24 +412,26 @@ fn compute_desired(app: &AppHandle, icon_state: TrayIconState) -> TrayDesired {
     // The busy menu has no language submenu, so skip the detector lookup (a
     // disk probe) on the dictation path. Going idle rebuilds it fresh.
     let model_manager = app.state::<Arc<ModelManager>>();
-    let language = if icon_state.is_busy() {
-        None
-    } else {
-        model_manager
-            .get_model_info(&settings.selected_model)
-            .and_then(|model| {
-                language_menu(
-                    &settings,
-                    &model,
-                    model_manager.language_detector_path().is_some(),
-                )
-            })
-    };
+    let busy = icon_state.is_busy();
+    let model = (!busy)
+        .then(|| model_manager.get_model_info(&settings.selected_model))
+        .flatten();
+    let language = model.as_ref().and_then(|model| {
+        language_menu(
+            &settings,
+            model,
+            model_manager.language_detector_path().is_some(),
+        )
+    });
+    let translate_to_english = model
+        .filter(|model| model.supports_translation)
+        .map(|_| settings.translate_to_english);
+    let microphones = app.state::<TrayState>().lock().microphones.clone();
 
     TrayDesired {
         icon_path: get_icon_path(theme, icon_state, badge),
         menu: MenuInputs {
-            busy: icon_state.is_busy(),
+            busy,
             models_locked,
             secure_input,
             notice: notice.map(|notice| notice.code),
@@ -394,6 +441,10 @@ fn compute_desired(app: &AppHandle, icon_state: TrayIconState) -> TrayDesired {
             locale: settings.app_language,
             update_checks_enabled: settings.update_checks_enabled,
             language,
+            selected_microphone: settings.selected_microphone,
+            microphones,
+            translate_to_english,
+            setup_complete: settings.onboarding_completed,
         },
     }
 }
@@ -467,45 +518,49 @@ fn language_menu(
 fn language_submenu(
     app: &AppHandle,
     strings: &crate::tray_i18n::TrayStrings,
-    menu: &LanguageMenu,
+    menu: Option<&LanguageMenu>,
 ) -> tauri::Result<Submenu<tauri::Wry>> {
-    let active_label = if menu.active == "auto" {
-        strings.auto_language.clone()
-    } else {
-        crate::languages::language_name(&menu.active)
-    };
-    let submenu = Submenu::with_id(
+    let submenu = Submenu::with_id_and_native_icon(
         app,
         "language_submenu",
-        format!("{} ({})", strings.language, active_label),
+        &strings.language,
         true,
+        Some(NativeIcon::Network),
     )?;
-    let item = |code: &str, label: &str, enabled: bool| {
-        CheckMenuItem::with_id(
-            app,
-            format!("language_select:{code}"),
-            label,
-            enabled,
-            menu.active == code,
-            None::<&str>,
-        )
-    };
-
-    submenu.append(&item("auto", &strings.auto_language, menu.auto_enabled)?)?;
-    if !menu.main.is_empty() {
-        submenu.append(&PredefinedMenuItem::separator(app)?)?;
-        for (code, name) in &menu.main {
-            submenu.append(&item(code, name, true)?)?;
+    if let Some(menu) = menu {
+        let item = |code: &str, label: &str, enabled: bool| {
+            CheckMenuItem::with_id(
+                app,
+                format!("language_select:{code}"),
+                label,
+                enabled,
+                menu.active == code,
+                None::<&str>,
+            )
+        };
+        submenu.append(&item("auto", &strings.auto_language, menu.auto_enabled)?)?;
+        if !menu.main.is_empty() {
+            submenu.append(&PredefinedMenuItem::separator(app)?)?;
+            for (code, name) in &menu.main {
+                submenu.append(&item(code, name, true)?)?;
+            }
         }
-    }
-    if !menu.others.is_empty() {
-        submenu.append(&PredefinedMenuItem::separator(app)?)?;
-        let others = Submenu::with_id(app, "language_others", &strings.other_languages, true)?;
-        for (code, name) in &menu.others {
-            others.append(&item(code, name, true)?)?;
+        if !menu.others.is_empty() {
+            let others = Submenu::with_id(app, "language_others", &strings.other_languages, true)?;
+            for (code, name) in &menu.others {
+                others.append(&item(code, name, true)?)?;
+            }
+            submenu.append(&others)?;
         }
-        submenu.append(&others)?;
+        submenu.append(&PredefinedMenuItem::separator(app)?)?;
     }
+    submenu.append(&MenuItem::with_id(
+        app,
+        "language_settings",
+        &strings.settings,
+        true,
+        None::<&str>,
+    )?)?;
     Ok(submenu)
 }
 
@@ -659,131 +714,187 @@ fn build_menu(app: &AppHandle, inputs: &MenuInputs) -> tauri::Result<(Menu<tauri
         })
         .transpose()?;
 
-    // Platform-specific accelerators
-    #[cfg(target_os = "macos")]
-    let (settings_accelerator, quit_accelerator) = (Some("Cmd+,"), Some("Cmd+Q"));
-    #[cfg(not(target_os = "macos"))]
-    let (settings_accelerator, quit_accelerator) = (Some("Ctrl+,"), Some("Ctrl+Q"));
+    let (settings_key, quit_key) = if cfg!(target_os = "macos") {
+        ("Cmd+,", "Cmd+Q")
+    } else {
+        ("Ctrl+,", "Ctrl+Q")
+    };
+    let item = |id: &str, label: &str, enabled, icon, key| {
+        IconMenuItem::with_id_and_native_icon(app, id, label, enabled, icon, key)
+    };
+    let menu = Menu::new(app)?;
+    let separator = || menu.append(&PredefinedMenuItem::separator(app)?);
 
-    // Create common menu items
-    let version_label = version_label();
-    let version_i = MenuItem::with_id(app, "version", &version_label, false, None::<&str>)?;
-    let settings_i = MenuItem::with_id(
-        app,
-        "settings",
-        &strings.settings,
-        true,
-        settings_accelerator,
-    )?;
-    let check_updates_i = MenuItem::with_id(
-        app,
-        "check_updates",
-        &strings.check_updates,
-        inputs.update_checks_enabled,
-        None::<&str>,
-    )?;
-    let copy_last_transcript_i = MenuItem::with_id(
-        app,
+    let mut tooltip = version_label();
+    if let Some(warning) = secure_input_warning {
+        tooltip = format!("{} — {}", tooltip, warning.text()?);
+        menu.append(&warning)?;
+    }
+    if let Some(notice) = notice_line {
+        menu.append(&notice)?;
+    }
+    if inputs.secure_input || inputs.notice.is_some() {
+        separator()?;
+    }
+
+    if inputs.busy {
+        menu.append(&item(
+            "cancel",
+            &strings.cancel,
+            true,
+            Some(NativeIcon::StopProgressFreestanding),
+            None,
+        )?)?;
+    }
+    menu.append(&item(
         "copy_last_transcript",
         &strings.copy_last_transcript,
         true,
-        None::<&str>,
-    )?;
-    let quit_i = MenuItem::with_id(app, "quit", &strings.quit, true, quit_accelerator)?;
-    let separator = || PredefinedMenuItem::separator(app);
+        Some(NativeIcon::MultipleDocuments),
+        None,
+    )?)?;
+    separator()?;
 
-    let menu = if inputs.busy {
-        let cancel_i = MenuItem::with_id(app, "cancel", &strings.cancel, true, None::<&str>)?;
-        Menu::with_items(
+    menu.append(&item(
+        "settings",
+        &strings.settings,
+        true,
+        Some(NativeIcon::PreferencesGeneral),
+        Some(settings_key),
+    )?)?;
+
+    if !inputs.busy {
+        let models = Submenu::with_id_and_native_icon(
             app,
-            &[
-                &version_i,
-                &separator()?,
-                &cancel_i,
-                &separator()?,
-                &copy_last_transcript_i,
-                &separator()?,
-                &settings_i,
-                &check_updates_i,
-                &separator()?,
-                &quit_i,
-            ],
-        )?
-    } else {
-        // Build model submenu — label is the active model name
-        let submenu_label = inputs
-            .downloaded_models
-            .iter()
-            .find(|(id, _)| *id == inputs.selected_model)
-            .map(|(_, name)| name.clone())
-            .unwrap_or_else(|| strings.model.clone());
-
-        let model_submenu =
-            Submenu::with_id(app, "model_submenu", &submenu_label, !inputs.models_locked)?;
+            "model_submenu",
+            &strings.model,
+            true,
+            Some(NativeIcon::Computer),
+        )?;
         for (id, name) in &inputs.downloaded_models {
-            let is_active = *id == inputs.selected_model;
-            let item_id = format!("model_select:{}", id);
-            let item = CheckMenuItem::with_id(app, &item_id, name, true, is_active, None::<&str>)?;
-            model_submenu.append(&item)?;
+            models.append(&CheckMenuItem::with_id(
+                app,
+                format!("model_select:{id}"),
+                name,
+                !inputs.models_locked,
+                *id == inputs.selected_model,
+                None::<&str>,
+            )?)?;
         }
-
-        let unload_model_i = MenuItem::with_id(
+        if !inputs.downloaded_models.is_empty() {
+            models.append(&PredefinedMenuItem::separator(app)?)?;
+        }
+        models.append(&MenuItem::with_id(
             app,
-            "unload_model",
-            &strings.unload_model,
-            inputs.model_loaded && !inputs.models_locked,
+            "models",
+            &strings.manage_models,
+            true,
             None::<&str>,
-        )?;
-
-        let menu = Menu::with_items(
-            app,
-            &[
-                &version_i,
-                &separator()?,
-                &copy_last_transcript_i,
-                &separator()?,
-                &model_submenu,
-                &unload_model_i,
-                &separator()?,
-                &settings_i,
-                &check_updates_i,
-                &separator()?,
-                &quit_i,
-            ],
-        )?;
-        // Right below the model submenu: version, separator, copy, separator, model.
-        if let Some(language) = &inputs.language {
-            menu.insert(&language_submenu(app, &strings, language)?, 5)?;
+        )?)?;
+        if inputs.model_loaded {
+            models.append(&MenuItem::with_id(
+                app,
+                "unload_model",
+                &strings.unload_model,
+                !inputs.models_locked,
+                None::<&str>,
+            )?)?;
         }
-        menu
-    };
+        menu.append(&models)?;
 
-    // When update checks are forced off (e.g. HANDY_DISABLE_UPDATER, set by
-    // the Nix package), the item is dropped from the menu rather than shown
-    // disabled — it can never do anything in that case, and a disabled item
-    // still shifts every entry below it by one position. A manually-disabled
-    // toggle in Debug Settings keeps the old greyed-out behavior via the
-    // enabled flag.
-    if settings::update_checks_forced_disabled() {
-        menu.remove(&check_updates_i)?;
+        menu.append(&language_submenu(app, &strings, inputs.language.as_ref())?)?;
+        if let Some(checked) = inputs.translate_to_english {
+            menu.append(&CheckMenuItem::with_id(
+                app,
+                "translate_to_english",
+                &strings.translate_to_english,
+                true,
+                checked,
+                None::<&str>,
+            )?)?;
+        }
+        let microphone = Submenu::with_id_and_native_icon(
+            app,
+            "microphone_submenu",
+            &strings.microphone,
+            true,
+            Some(NativeIcon::IChatTheater),
+        )?;
+        let active = inputs.selected_microphone.as_deref().unwrap_or("default");
+        for (id, name) in &inputs.microphones {
+            let name = if id == "default" {
+                &strings.system_default
+            } else {
+                name
+            };
+            microphone.append(&CheckMenuItem::with_id(
+                app,
+                format!("microphone_select:{id}"),
+                name,
+                true,
+                id == active,
+                None::<&str>,
+            )?)?;
+        }
+        if !inputs.microphones.is_empty() {
+            microphone.append(&PredefinedMenuItem::separator(app)?)?;
+        }
+        microphone.append(&MenuItem::with_id(
+            app,
+            "microphone_settings",
+            &strings.microphone_settings,
+            true,
+            None::<&str>,
+        )?)?;
+        menu.append(&microphone)?;
     }
+    menu.append(&item(
+        "shortcuts",
+        &strings.shortcuts,
+        true,
+        Some(NativeIcon::Advanced),
+        None,
+    )?)?;
+    separator()?;
 
-    // Both layouts start with [version, separator, ...]; slot the warnings in
-    // right below the version line so they're the first actionable thing seen.
-    let mut tooltip = version_label;
-    let mut position = 2;
-    if let Some(warning_item) = secure_input_warning {
-        menu.insert(&warning_item, position)?;
-        position += 1;
-        tooltip = format!("{} — {}", tooltip, warning_item.text().unwrap_or_default());
+    menu.append(&item(
+        "transcribe_file",
+        &strings.transcribe_file,
+        inputs.setup_complete,
+        Some(NativeIcon::Folder),
+        None,
+    )?)?;
+    menu.append(&item(
+        "history",
+        &strings.history,
+        inputs.setup_complete,
+        Some(NativeIcon::ListView),
+        None,
+    )?)?;
+    separator()?;
+    menu.append(&item(
+        "about",
+        &strings.about,
+        true,
+        Some(NativeIcon::Info),
+        None,
+    )?)?;
+    if !settings::update_checks_forced_disabled() {
+        menu.append(&item(
+            "check_updates",
+            &strings.check_updates,
+            inputs.update_checks_enabled,
+            Some(NativeIcon::RefreshFreestanding),
+            None,
+        )?)?;
     }
-    if let Some(notice_item) = notice_line {
-        menu.insert(&notice_item, position)?;
-        position += 1;
-    }
-    if position > 2 {
-        menu.insert(&separator()?, position)?;
-    }
+    menu.append(&item(
+        "quit",
+        &format!("{} Prism", strings.quit),
+        true,
+        None,
+        Some(quit_key),
+    )?)?;
 
     Ok((menu, tooltip))
 }
@@ -989,6 +1100,10 @@ mod tests {
             locale: "en".to_string(),
             update_checks_enabled: true,
             language: None,
+            selected_microphone: None,
+            microphones: Vec::new(),
+            translate_to_english: None,
+            setup_complete: true,
         }
     }
 

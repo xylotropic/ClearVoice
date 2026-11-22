@@ -291,11 +291,41 @@ fn initialize_core_logic(app_handle: &AppHandle) {
     {
         tray_builder = tray_builder.show_menu_on_left_click(true);
     }
+    #[cfg(target_os = "macos")]
+    {
+        tray_builder = tray_builder.on_tray_icon_event(|icon, event| {
+            if matches!(event, tauri::tray::TrayIconEvent::Enter { .. }) {
+                tray::refresh_microphones(icon.app_handle());
+            }
+        });
+    }
 
     let tray = tray_builder
         .on_menu_event(|app, event| match event.id.as_ref() {
-            "settings" => {
+            id @ ("settings"
+            | "shortcuts"
+            | "models"
+            | "language_settings"
+            | "microphone_settings"
+            | "history"
+            | "transcribe_file"
+            | "about") => {
                 show_main_window(app);
+                let _ = app.emit_to("main", "tray-action", id);
+            }
+            "translate_to_english" => {
+                let enabled = !settings::get_settings(app).translate_to_english;
+                if let Err(err) =
+                    shortcut::change_translate_to_english_setting(app.clone(), enabled)
+                {
+                    log::warn!("Could not change translation mode: {err}");
+                }
+                let _ = app.emit(
+                    "settings-changed",
+                    serde_json::json!({
+                        "setting": "translate_to_english",
+                    }),
+                );
             }
             "secure_input_warning" => {
                 // Full explanation lives in the settings-window banner
@@ -340,6 +370,7 @@ fn initialize_core_logic(app_handle: &AppHandle) {
                 let model_id = id.strip_prefix("model_select:").unwrap().to_string();
                 let current_model = settings::get_settings(app).selected_model;
                 if model_id == current_model {
+                    tray::rebuild_tray_menu(app);
                     return;
                 }
                 let app_clone = app.clone();
@@ -352,7 +383,24 @@ fn initialize_core_logic(app_handle: &AppHandle) {
                             log::error!("Failed to switch model via tray: {}", e);
                         }
                     }
-                    tray::update_tray_menu(&app_clone);
+                    tray::rebuild_tray_menu(&app_clone);
+                });
+            }
+            id if id.starts_with("microphone_select:") => {
+                let name = id.trim_start_matches("microphone_select:").to_string();
+                let app = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    if let Err(err) =
+                        commands::audio::set_selected_microphone(app.clone(), name).await
+                    {
+                        log::warn!("Could not update microphone: {err}");
+                    }
+                    let _ = app.emit(
+                        "settings-changed",
+                        serde_json::json!({
+                            "setting": "selected_microphone",
+                        }),
+                    );
                 });
             }
             id if id.starts_with("language_select:") => {
@@ -374,6 +422,8 @@ fn initialize_core_logic(app_handle: &AppHandle) {
 
     // Initialize tray menu with idle state
     tray::update_tray_menu(app_handle);
+    #[cfg(target_os = "macos")]
+    tray::refresh_microphones(app_handle);
 
     // Apply show_tray_icon setting
     let settings = settings::get_settings(app_handle);
@@ -952,6 +1002,9 @@ pub fn run(cli_args: CliArgs) {
         .manage(cli_args.clone())
         .manage(notices::NoticeStore::default())
         .setup(move |app| {
+            #[cfg(target_os = "macos")]
+            portable::migrate_clearvoice_data(app.handle())?;
+
             #[cfg(target_os = "windows")]
             log::info!(
                 "Vulkan layer policy: VK_LOADER_LAYERS_DISABLE={:?}, HANDY_KEEP_VULKAN_IMPLICIT_LAYERS={}",

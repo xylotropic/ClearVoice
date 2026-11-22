@@ -93,15 +93,14 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     selectModel,
   ]);
 
-  // Demo and Try it teach hold and tap, which only hold_or_toggle supports;
-  // settings migrated from push_to_talk may still be Toggle or PushToTalk.
+  // Teach the same hold-to-talk shortcut that Prism uses after setup.
   const activationSet = useRef(false);
   const activation = settings?.shortcut_activation;
   useEffect(() => {
     if (preview || !activation || activationSet.current) return;
     activationSet.current = true;
-    if (activation !== "hold_or_toggle")
-      updateSetting("shortcut_activation", "hold_or_toggle");
+    if (activation !== "push_to_talk")
+      updateSetting("shortcut_activation", "push_to_talk");
   }, [preview, activation]);
 
   // Before first paint so a preview never shows the saved step.
@@ -152,7 +151,6 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     // Saved only now: each login item change posts a macOS notification.
     if (!preview) {
       await updateSetting("autostart_enabled", store.atLogin);
-      await updateSetting("shortcut_activation", "push_to_talk");
       await commands.completeOnboarding();
     }
     onComplete();

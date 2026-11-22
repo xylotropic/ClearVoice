@@ -16,3 +16,58 @@ test.describe("Handy App", () => {
     expect(html).toContain("<body");
   });
 });
+
+test("setup uses Prism's light palette and keeps the language picker editable", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "__TAURI_OS_PLUGIN_INTERNALS__", {
+      value: { platform: "macos", os_type: "macos", locale: "en-US" },
+    });
+    localStorage.setItem(
+      "handy.onboarding",
+      JSON.stringify({ step: "welcome", languages: ["en"] }),
+    );
+  });
+  await page.route("**/src/main.tsx", async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      response,
+      body:
+        `import { mockIPC } from "/node_modules/@tauri-apps/api/mocks.js";
+mockIPC((cmd) => {
+  if (cmd === "get_app_settings") {
+    return { app_language: "en", theme: "dark", onboarding_completed: false, shortcut_activation: "push_to_talk" };
+  }
+  if (cmd.includes("permission")) return true;
+  if (cmd.startsWith("get_available") || cmd === "get_active_notices") return [];
+  if (cmd.includes("locale")) return "en-US";
+}, { shouldMockEvents: true });
+` + (await response.text()),
+    });
+  });
+
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: "Free Voice Transcription" }),
+  ).toBeVisible();
+  await expect(page.locator("[data-onboarding]")).toHaveCSS(
+    "background-color",
+    "rgb(255, 255, 255)",
+  );
+  await expect(
+    page.getByRole("group", { name: "Languages", exact: true }),
+  ).toHaveCount(0);
+
+  const search = page.locator("[data-onboarding] input[type=text]");
+  await search.fill("Spanish");
+  await search.press("Enter");
+  await expect(
+    page.getByRole("button", { name: /Remove Spanish/ }),
+  ).toBeVisible();
+  await search.press("Escape");
+  await expect(
+    page.getByRole("group", { name: "Languages", exact: true }),
+  ).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Continue" })).toBeEnabled();
+});
