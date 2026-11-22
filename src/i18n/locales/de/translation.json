@@ -531,6 +531,7 @@
         "description": "Das Prism-Symbol in der Taskleiste anzeigen."
       },
       "overlay": {
+        "accent": "Akzentfarbe der Notch",
         "animation": {
           "title": "Textanimation",
           "generate": "Sanftes Einblenden",

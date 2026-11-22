@@ -4,21 +4,24 @@ import { Loader2, Lock, Trash2, X } from "lucide-react";
 import { DownloadMark } from "@/components/shared/DownloadMark";
 import { Radio } from "@/components/ui/Radio";
 import { Button } from "@/components/ui/Button";
+import { ModelMakerIcon } from "./ModelMakerIcon";
 import { ModelTableRow } from "@/components/shared/modelTable/ModelTableRow";
 import { formatModelSize } from "@/lib/utils/format";
 import { useModelStore } from "@/stores/modelStore";
 import { useModelsLocked } from "@/stores/transcriptionJobsStore";
-import { useIsTarget, usePlace, type Entry } from "./modelEntries";
+import { usePlace, type Entry } from "./modelEntries";
 import { cancelModelPick, pickModel } from "@/stores/modelPickStore";
 
 /** A Models page row: the shared table row plus use, stop and delete. */
 export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
   const { t } = useTranslation();
   const place = usePlace(entry.id);
-  const target = useIsTarget(entry.id);
   const locked = useModelsLocked();
   const percent = useModelStore(
     (s) => s.downloadProgress[entry.id]?.percentage ?? 0,
+  );
+  const hasProgress = useModelStore(
+    (s) => (s.downloadProgress[entry.id]?.total ?? 0) > 0,
   );
   const [asking, setAsking] = useState(false);
   // Pressed while locked: this row says why nothing happened.
@@ -41,7 +44,7 @@ export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
   const size = formatModelSize(entry.sizeMb);
   const download =
     place === "downloading" || place === "checking"
-      ? { state: place, percent }
+      ? { state: place, percent, indeterminate: !hasProgress }
       : null;
 
   const mark = (() => {
@@ -76,13 +79,8 @@ export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
     t("modelSelector.lockedWhileTranscribing")
   ) : place === "loading" ? (
     t("settings.models.loading")
-  ) : place === "downloading" && target && !locked ? (
-    <span className="tabular-nums">
-      {t("settings.models.downloadingThenUse", {
-        percent: Math.round(percent),
-        total: size,
-      })}
-    </span>
+  ) : place === "downloading" && !hasProgress ? (
+    t("onboarding.download.downloading", { name: entry.name })
   ) : undefined;
 
   // Pressing a download makes it the one to switch to when it's done.
@@ -172,6 +170,7 @@ export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
       entry={entry}
       selected={on}
       mark={mark}
+      modelIcon={<ModelMakerIcon family={entry.model?.family} />}
       download={download}
       line={line}
       compact

@@ -531,6 +531,7 @@
         "description": "Display the Prism icon in the system tray."
       },
       "overlay": {
+        "accent": "Notch Accent",
         "animation": {
           "title": "Text Animation",
           "generate": "Text Generate Effect",

@@ -5,9 +5,8 @@
   /* Near-opaque app surface (theme.css --color-background at 98%). Auto-flips
      light/dark with --color-background, so no dark-mode override is needed. */
   --s-surface: color-mix(in srgb, var(--color-background) 98%, transparent);
-  --s-accent: #2786f3;
-  /* The rest come from theme.css, which already follows the theme setting. */
-  --s-accent-soft: color-mix(in srgb, var(--s-accent) 20%, transparent);
+  --s-accent: #47a6ff;
+  --s-deep: #3166fd;
   --s-muted: var(--color-ink-2);
   --s-faint: var(--color-ink-3);
   --s-border: var(--color-line);
@@ -37,6 +36,10 @@
    drawn past it (matters for the 4px top offset on Windows/Linux).
    ============================================================ */
 .ov-stage {
+  --s-bright: color-mix(in srgb, var(--s-accent) 28%, white);
+  --s-glow: color-mix(in srgb, var(--s-accent) 76%, transparent);
+  /* The rest come from theme.css, which already follows the theme setting. */
+  --s-accent-soft: color-mix(in srgb, var(--s-accent) 20%, transparent);
   position: fixed;
   inset: 0;
   display: flex;
@@ -269,7 +272,7 @@
   from {
     opacity: 0;
     filter: blur(3px);
-    text-shadow: 0 0 8px #378bff;
+    text-shadow: 0 0 8px var(--s-accent);
   }
   to {
     opacity: 1;
@@ -283,9 +286,9 @@
   background: linear-gradient(
       102deg,
       transparent 14%,
-      #204bff50 31%,
-      #2196ffc4 48%,
-      #87e1ffad 57%,
+      color-mix(in srgb, var(--s-deep) 32%, transparent) 31%,
+      var(--s-glow) 48%,
+      color-mix(in srgb, var(--s-bright) 68%, transparent) 57%,
       transparent 83%
     )
     no-repeat 100% 50% / 245% 100%;
@@ -297,7 +300,7 @@
 @keyframes transcript-sweep {
   from {
     background-position: 100% 50%;
-    text-shadow: 0 0 8px #52b8ffc4;
+    text-shadow: 0 0 8px var(--s-glow);
   }
   to {
     background-position: 0 50%;
@@ -322,12 +325,12 @@
   inset: 0;
   opacity: 0;
   overflow: hidden;
-  color: #6bd0ff;
+  color: var(--s-accent);
   font-family: ui-monospace, Menlo, monospace;
   font-size: 0.86em;
   text-shadow:
-    0 0 7px #188cff,
-    0 0 13px #0769ed;
+    0 0 7px var(--s-accent),
+    0 0 13px var(--s-deep);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
@@ -370,7 +373,7 @@
     clip-path: inset(0 100% 0 0);
   }
   63% {
-    text-shadow: 0 0 8px #44b8fff0;
+    text-shadow: 0 0 8px var(--s-glow);
   }
   100% {
     clip-path: inset(0);
@@ -401,7 +404,7 @@
     clip-path: inset(0 0 0 100%);
   }
   63% {
-    text-shadow: 0 0 8px #44b8fff0;
+    text-shadow: 0 0 8px var(--s-glow);
   }
   100% {
     clip-path: inset(0);
@@ -421,7 +424,6 @@
   --ov-pill-w: 254px;
   --ov-work-w: 278px;
   --ov-base-h: 43px;
-  --s-accent: #66c3ff;
   --s-muted: #acbdd1;
   --s-faint: #a0b3cd;
 }
@@ -451,19 +453,23 @@
 .ov-stage.mac-notch .swave.ready i {
   width: 3px;
   max-height: 30px;
-  background: linear-gradient(#dcfcff, #4ac7ff 51%, #3166fd);
-  box-shadow: 0 0 7px #318affab;
+  background: linear-gradient(
+    var(--s-bright),
+    var(--s-accent) 51%,
+    var(--s-deep)
+  );
+  box-shadow: 0 0 7px var(--s-glow);
 }
 .ov-stage.mac-notch [data-speaking] .swave.ready i {
-  box-shadow: 0 0 10px #42a9ffdc;
+  box-shadow: 0 0 10px var(--s-accent);
 }
 .ov-stage.docked .scard {
   border-top: 0;
   border-radius: 0 0 23px 23px;
 }
 .ov-stage.paste-confirmed .scard {
-  border-color: #47a6ff;
-  box-shadow: inset 0 0 0 1px #47a6ff;
+  border-color: var(--s-accent);
+  box-shadow: inset 0 0 0 1px var(--s-accent);
 }
 .ov-stage.docked .sbase {
   color: #edf6ff;
@@ -485,7 +491,7 @@
 }
 .ov-stage.docked .listening .swave i {
   width: 3px;
-  box-shadow: 0 0 7px #42a9ffc0;
+  box-shadow: 0 0 7px var(--s-glow);
 }
 .ov-stage.docked .listening .swave.arming i {
   box-shadow: none;
@@ -498,7 +504,7 @@
 .ov-stage.docked .stext-cap {
   padding: 7px 17px 11px;
   color: #f3f8ff;
-  box-shadow: inset 0 1px 0 #84bcff24;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--s-accent) 14%, transparent);
 }
 .ov-stage.docked .stext-cap.overflowing {
   padding-top: 0;
@@ -508,15 +514,11 @@
   color: #edf6ff;
 }
 .ov-stage.docked .sbase .sx {
-  color: #bed3ee;
-  background: #8bbcff12;
+  color: var(--s-bright);
+  background: color-mix(in srgb, var(--s-accent) 7%, transparent);
 }
 .ov-stage.docked .sbase .sx:hover {
-  background: #93c5ff26;
-}
-
-:root[data-theme="dark"] {
-  --s-accent: #83c5ff;
+  background: color-mix(in srgb, var(--s-accent) 15%, transparent);
 }
 
 .ov-stage.attached {
@@ -527,6 +529,21 @@
 .ov-stage.attached .scard {
   animation: none;
   border-radius: 0 0 16px 16px;
+}
+/* Reveal the panel from the camera outwards without moving its top edge or
+   scaling the logo and waveform into the camera's hidden area. */
+.ov-stage.attached .scard:has(> .sbase.listening) {
+  animation: notch-expand 340ms cubic-bezier(0.22, 0.68, 0.22, 1) both;
+}
+@keyframes notch-expand {
+  from {
+    clip-path: inset(
+      0 max(0px, calc(50% - var(--camera-width) / 2)) 54% round 0 0 12px 12px
+    );
+  }
+  to {
+    clip-path: inset(0 round 0 0 16px 16px);
+  }
 }
 .ov-stage.attached .sbase {
   box-sizing: border-box;
@@ -575,7 +592,7 @@
 .cancel-toast {
   color: #f3f8ff;
   background: #090b10;
-  border: 1px solid #334b6d;
+  border: 1px solid color-mix(in srgb, var(--s-accent) 36%, #272727);
   border-radius: 14px;
   box-sizing: border-box;
   display: flex;
@@ -587,6 +604,20 @@
   gap: 9px;
   padding: 7px 9px 7px 11px;
   margin: 8px 0;
+}
+/* Let the cancellation notice slide down from behind the screen edge. */
+.ov-stage.top .cancel-toast {
+  animation: cancel-slide-in 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes cancel-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-100% - var(--camera-height) - 8px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .ov-stage.attached .cancel-toast {
   margin-top: calc(var(--camera-height) + 8px);
@@ -609,11 +640,11 @@
   padding: 5px 7px;
   font: inherit;
   font-size: 12px;
-  color: #d7ebff;
-  background: #162c49;
+  color: var(--s-bright);
+  background: color-mix(in srgb, var(--s-accent) 20%, #090b10);
 }
 .cancel-toast-undo:hover {
-  background: #22446c;
+  background: color-mix(in srgb, var(--s-accent) 34%, #090b10);
 }
 .cancel-toast-dismiss {
   flex: none;
@@ -626,7 +657,7 @@
   background: #ffffff16;
 }
 .cancel-toast button:focus-visible {
-  outline: 2px solid #72baff;
+  outline: 2px solid var(--s-accent);
   outline-offset: 2px;
 }
 

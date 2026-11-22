@@ -133,6 +133,14 @@ async changeTranscriptAnimation(animation: TranscriptAnimation) : Promise<Result
     else return { status: "error", error: e  as any };
 }
 },
+async changeOverlayAccent(accent: OverlayAccent) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("change_overlay_accent", { accent }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async changeDebugModeSetting(enabled: boolean) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("change_debug_mode_setting", { enabled }) };
@@ -1212,7 +1220,7 @@ language_detection_window_secs?: number;
  * not gated on this — that follows model capability. Migrated from the old
  * `overlay_position` (position `none` → style `None`).
  */
-overlay_style?: OverlayStyle; transcript_animation?: TranscriptAnimation }
+overlay_style?: OverlayStyle; transcript_animation?: TranscriptAnimation; overlay_accent?: OverlayAccent }
 export type AudioDevice = { index: string; name: string; is_default: boolean }
 export type AutoSubmitKey = "enter" | "ctrl_enter" | "cmd_enter"
 export type AutoUnavailableReason = 
@@ -1408,6 +1416,7 @@ notices: Notice[];
  * `None` when a notice was cleared.
  */
 raised: Notice | null }
+export type OverlayAccent = "cherenkov" | "euclidian" | "ptolemic" | "newtonian" | "maxwells" | "hertzes"
 export type OverlayPosition = "top" | "bottom"
 /**
  * Which recording overlay to display. `Minimal` and `Live` share one base

@@ -531,6 +531,7 @@
         "description": "Vis Prism-ikonet i meddelelsesområdet."
       },
       "overlay": {
+        "accent": "Notchens accentfarve",
         "animation": {
           "title": "Tekstanimation",
           "generate": "Gradvis fremtoning",

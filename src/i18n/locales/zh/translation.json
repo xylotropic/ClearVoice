@@ -531,6 +531,7 @@
         "description": "在系统托盘中显示 Prism 图标。"
       },
       "overlay": {
+        "accent": "刘海强调色",
         "animation": {
           "title": "文字动画",
           "generate": "文字渐显",

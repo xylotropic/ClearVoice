@@ -531,6 +531,7 @@
         "description": "Mostra l'icona di Prism nella barra di sistema."
       },
       "overlay": {
+        "accent": "Colore di risalto della tacca",
         "animation": {
           "title": "Animazione del testo",
           "generate": "Comparsa graduale",

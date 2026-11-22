@@ -531,6 +531,7 @@
         "description": "Prism simgesini sistem tepsisinde göster."
       },
       "overlay": {
+        "accent": "Çentik vurgu rengi",
         "animation": {
           "title": "Metin animasyonu",
           "generate": "Kademeli görünme",

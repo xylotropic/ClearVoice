@@ -24,7 +24,7 @@ export type Facts = Grading & {
 };
 
 export interface Lists {
-  /** On disk: the one in use first, then best fit; custom and old last. */
+  /** On disk: best fit first; custom and old last. */
   yours: Entry[];
   /** Curated, not on disk, hearing all your languages: the picks first. */
   fits: Entry[];
@@ -44,7 +44,6 @@ export const useModelEntries = () => {
   const langs = spoken?.length ? spoken : suggestedLanguages();
   const { groups, grading } = useModelCatalog(langs);
   const infos = useModelStore((s) => s.models);
-  const current = useModelStore((s) => s.currentModel);
 
   const entries = useMemo(
     () =>
@@ -84,12 +83,7 @@ export const useModelEntries = () => {
     const byFit = (a: Entry, b: Entry) => facts.rankOf(a) - facts.rankOf(b);
     const yours = entries
       .filter(onDisk)
-      .sort(
-        (a, b) =>
-          Number(b.id === current) - Number(a.id === current) ||
-          KIND_ORDER[a.kind] - KIND_ORDER[b.kind] ||
-          byFit(a, b),
-      );
+      .sort((a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || byFit(a, b));
     const rest = entries.filter((e) => !onDisk(e));
     const curated = rest.filter((e) => e.kind === "curated").sort(byFit);
     return {
@@ -98,7 +92,7 @@ export const useModelEntries = () => {
       partial: curated.filter((e) => facts.missing(e.model).length > 0),
       untested: rest.filter((e) => e.kind !== "curated").sort(byFit),
     };
-  }, [entries, infos, current, facts]);
+  }, [entries, infos, facts]);
 
   return { facts, lists };
 };
@@ -124,6 +118,3 @@ export const usePlace = (id: string): Place => {
   if (state !== "ready") return "remote";
   return current ? "active" : "ready";
 };
-
-export const useIsTarget = (id: string) =>
-  useModelPickStore((s) => s.target === id);

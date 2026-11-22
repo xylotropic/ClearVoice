@@ -531,6 +531,7 @@
         "description": "Hiển thị biểu tượng Prism trong khay hệ thống."
       },
       "overlay": {
+        "accent": "Màu nhấn của tai thỏ",
         "animation": {
           "title": "Hiệu ứng văn bản",
           "generate": "Hiện dần từng từ",

@@ -51,6 +51,7 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
 }) => {
   const { t } = useTranslation();
   const loading = useModelStore((s) => s.loading);
+  const currentModel = useModelStore((s) => s.currentModel);
   const { facts, lists } = useModelEntries();
   const { filters, setFilters, searching, matches } = useModelFilters();
   const [more, setMore] = useState(false);
@@ -66,6 +67,11 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
   }
 
   const keep = (xs: typeof lists.yours) => xs.filter(matches);
+  const visibleInstalled = lists.yours.slice(0, YOURS_LIMIT);
+  const activeOutsideList = lists.yours
+    .slice(YOURS_LIMIT)
+    .find((model) => model.id === currentModel);
+  if (activeOutsideList) visibleInstalled[YOURS_LIMIT - 1] = activeOutsideList;
   const moreButton = !searching && lists.yours.length > YOURS_LIMIT && (
     <button
       type="button"
@@ -117,7 +123,7 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
               <Rescan />
             </>
           ),
-          rows: more ? lists.yours : lists.yours.slice(0, YOURS_LIMIT),
+          rows: more ? lists.yours : visibleInstalled,
           after: lists.yours.length ? (
             moreButton
           ) : (

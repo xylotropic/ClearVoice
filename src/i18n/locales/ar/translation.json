@@ -531,6 +531,7 @@
         "description": ".عرض أيقونة Prism في شريط النظام"
       },
       "overlay": {
+        "accent": "لون النتوء",
         "animation": {
           "title": "حركة النص",
           "generate": "ظهور تدريجي",

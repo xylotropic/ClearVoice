@@ -531,6 +531,7 @@
         "description": "在系統匣中顯示 Prism 圖示"
       },
       "overlay": {
+        "accent": "瀏海強調色",
         "animation": {
           "title": "文字動畫",
           "generate": "文字淡入",

@@ -531,6 +531,7 @@
         "description": "Mostra la icona del Prism a la safata del sistema."
       },
       "overlay": {
+        "accent": "Color d’accent de l’osca",
         "animation": {
           "title": "Animació del text",
           "generate": "Aparició gradual",

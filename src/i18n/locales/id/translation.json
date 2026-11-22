@@ -531,6 +531,7 @@
         "description": "Tampilkan ikon Prism di baki sistem."
       },
       "overlay": {
+        "accent": "Warna Aksen Notch",
         "animation": {
           "title": "Animasi teks",
           "generate": "Muncul bertahap",

@@ -148,12 +148,24 @@ pub enum OverlayStyle {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum TranscriptAnimation {
-    #[default]
     Generate,
     Encrypted,
+    #[default]
     Sweep,
     Typewriter,
     Off,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum OverlayAccent {
+    #[default]
+    Cherenkov,
+    Euclidian,
+    Ptolemic,
+    Newtonian,
+    Maxwells,
+    Hertzes,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Type, Default)]
@@ -596,6 +608,8 @@ pub struct AppSettings {
     pub overlay_style: OverlayStyle,
     #[serde(default)]
     pub transcript_animation: TranscriptAnimation,
+    #[serde(default)]
+    pub overlay_accent: OverlayAccent,
 }
 
 fn default_model() -> String {
@@ -1103,6 +1117,7 @@ pub fn get_default_settings() -> AppSettings {
         language_detection_window_secs: default_language_detection_window_secs(),
         overlay_style: default_overlay_style(),
         transcript_animation: TranscriptAnimation::default(),
+        overlay_accent: OverlayAccent::default(),
     }
 }
 

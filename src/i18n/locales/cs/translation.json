@@ -531,6 +531,7 @@
         "description": "Zobrazit ikonu Prism v systémové liště."
       },
       "overlay": {
+        "accent": "Barva výřezu",
         "animation": {
           "title": "Animace textu",
           "generate": "Postupné odhalení",

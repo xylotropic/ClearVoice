@@ -4,10 +4,12 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
 import { LiveTranscript } from "./LiveTranscript";
-import prismMark from "@/assets/prism-mark.webp";
+import prismMark from "@/assets/prism-notch-icon.png";
+import { DEFAULT_OVERLAY_ACCENT, OVERLAY_ACCENTS } from "@/lib/overlayAccent";
 import { commands, events } from "@/bindings";
 import type {
   Notice,
+  OverlayAccent,
   StreamPhase,
   StreamPhaseEvent,
   StreamTextEvent,
@@ -71,7 +73,8 @@ const RecordingOverlay: React.FC = () => {
   // Stay visually in an arming state until the backend processes the first
   // actual microphone sample chunk.
   const [captureReady, setCaptureReady] = useState(false);
-  const [animation, setAnimation] = useState<TranscriptAnimation>("generate");
+  const [animation, setAnimation] = useState<TranscriptAnimation>("sweep");
+  const [accent, setAccent] = useState<OverlayAccent>(DEFAULT_OVERLAY_ACCENT);
   // Recording starts while the model loads in the background. Say so, otherwise
   // a cold start looks like an empty Live preview that ignores speech, then a
   // hung "Transcribing..." spinner. Once recording stops, any in-flight load is
@@ -170,7 +173,8 @@ const RecordingOverlay: React.FC = () => {
         try {
           const settings = await commands.getAppSettings();
           if (settings.status === "ok") {
-            setAnimation(settings.data.transcript_animation ?? "generate");
+            setAnimation(settings.data.transcript_animation ?? "sweep");
+            setAccent(settings.data.overlay_accent ?? DEFAULT_OVERLAY_ACCENT);
             setPosition(
               settings.data.overlay_position === "top" ? "top" : "bottom",
             );
@@ -335,12 +339,13 @@ const RecordingOverlay: React.FC = () => {
   ]
     .filter(Boolean)
     .join(" ");
-  const displayInsets = attached
-    ? ({
-        "--camera-width": `${displayLayout.cameraWidth}px`,
-        "--camera-height": `${displayLayout.cameraHeight}px`,
-      } as React.CSSProperties)
-    : undefined;
+  const palette = OVERLAY_ACCENTS[accent];
+  const stageStyle = {
+    "--s-accent": palette.color,
+    "--s-deep": palette.deep,
+    "--camera-width": `${attached ? displayLayout.cameraWidth : 0}px`,
+    "--camera-height": `${attached ? displayLayout.cameraHeight : 0}px`,
+  } as React.CSSProperties;
 
   // Re-pin when the user is within ~a line of the bottom; unpin otherwise.
   const handleStreamScroll = () => {
@@ -447,7 +452,7 @@ const RecordingOverlay: React.FC = () => {
       <div
         className={`${stageClass} ov-fade ${isVisible ? "show" : ""}`}
         dir={direction}
-        style={displayInsets}
+        style={stageStyle}
       >
         <div className="cancel-toast">
           <img src={prismMark} alt="" width={24} height={24} />
@@ -503,7 +508,7 @@ const RecordingOverlay: React.FC = () => {
         dir={direction}
         className={stageClass}
         data-animation={animation}
-        style={displayInsets}
+        style={stageStyle}
       >
         {noticeProbe}
         <div
@@ -564,7 +569,7 @@ const RecordingOverlay: React.FC = () => {
     <div
       dir={direction}
       className={`${stageClass} ov-fade ${isVisible ? "show" : ""}`}
-      style={displayInsets}
+      style={stageStyle}
     >
       {noticeProbe}
       <div

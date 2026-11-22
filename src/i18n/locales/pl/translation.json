@@ -531,6 +531,7 @@
         "description": "Wyświetlaj ikonę Prism w zasobniku systemowym."
       },
       "overlay": {
+        "accent": "Kolor akcentu wcięcia",
         "animation": {
           "title": "Animacja tekstu",
           "generate": "Stopniowe pojawianie",

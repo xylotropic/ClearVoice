@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 test("streams revisions without replaying confirmed words", async ({
   page,
 }) => {
+  await mockOverlay(page, "bottom", "generate");
   await page.goto("/src/overlay/index.html");
 
   await expect(async () => {
@@ -44,6 +45,46 @@ test("streams revisions without replaying confirmed words", async ({
   await expect(page.getByText("write", { exact: true })).toHaveCount(0);
 });
 
+test("the recording notch expands from the display edge", async ({
+  browser,
+}) => {
+  const page = await browser.newPage({
+    viewport: { width: 344, height: 120 },
+    userAgent:
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/131.0.0.0",
+  });
+  try {
+    await mockOverlay(page, "top", undefined, "newtonian");
+    await page.goto("http://localhost:1420/src/overlay/index.html");
+    await expect(async () => {
+      await emit(page, "overlay-display-layout", {
+        position: "top",
+        cameraWidth: 160,
+        cameraHeight: 28,
+      });
+      await emit(page, "show-overlay", "streaming");
+      await expect(page.locator(".ov-stage.attached .scard")).toBeAttached({
+        timeout: 500,
+      });
+    }).toPass();
+    const card = page.locator(".scard");
+    await expect(page.locator(".ov-stage")).toHaveAttribute(
+      "data-animation",
+      "sweep",
+    );
+    await expect(card).toHaveCSS("animation-name", "notch-expand");
+    expect((await card.boundingBox())?.y).toBe(0);
+    await expect(card.locator(".smark")).toHaveCSS("filter", "none");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(card).toHaveCSS("animation-name", "none");
+    expect((await card.boundingBox())?.y).toBe(0);
+    await emit(page, "paste-confirmed");
+    await expect(card).toHaveCSS("border-bottom-color", "rgb(182, 152, 255)");
+  } finally {
+    await page.close();
+  }
+});
+
 test("the virtual notch stays attached as the live transcript opens", async ({
   browser,
 }) => {
@@ -74,7 +115,7 @@ test("the virtual notch stays attached as the live transcript opens", async ({
     const meter = await page.locator(".swave").boundingBox();
     expect(meter?.x).toBeGreaterThanOrEqual(344 / 2 + 80);
     const mark = page.locator(".smark");
-    await expect(mark).toHaveAttribute("src", /prism-mark/);
+    await expect(mark).toHaveAttribute("src", /prism-notch-icon/);
     const markBounds = await mark.boundingBox();
     expect((markBounds?.x ?? 0) + (markBounds?.width ?? 0)).toBeLessThanOrEqual(
       344 / 2 - 80,
@@ -132,6 +173,7 @@ test("the virtual notch stays attached as the live transcript opens", async ({
 });
 
 test("Escape feedback offers Undo for a recoverable take", async ({ page }) => {
+  await mockOverlay(page, "top");
   await page.goto("/src/overlay/index.html");
   await expect(async () => {
     await emit(page, "show-overlay", "recording");
@@ -140,6 +182,10 @@ test("Escape feedback offers Undo for a recoverable take", async ({ page }) => {
   await emit(page, "overlay-cancelled", { id: 7, canUndo: true });
   await emit(page, "show-overlay", "cancelled");
   await expect(page.getByRole("status")).toHaveText("Dictation canceled");
+  await expect(page.locator(".cancel-toast")).toHaveCSS(
+    "animation-name",
+    "cancel-slide-in",
+  );
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect
     .poll(() =>
@@ -224,7 +270,8 @@ function emit(page: Page, name: string, payload?: unknown) {
 async function mockOverlay(
   page: Page,
   position: "top" | "bottom",
-  animation?: "encrypted" | "sweep" | "typewriter" | "off",
+  animation?: "generate" | "encrypted" | "sweep" | "typewriter" | "off",
+  accent?: "newtonian",
 ) {
   await page.route("**/src/overlay/main.tsx", async (route) => {
     const response = await route.fetch();
@@ -242,6 +289,7 @@ mockIPC((cmd, args) => {
   app_language: "en",
   overlay_position: "${position}",
   transcript_animation: ${JSON.stringify(animation)},
+  overlay_accent: ${JSON.stringify(accent)},
   theme: "light"
   };
 }, { shouldMockEvents: true });

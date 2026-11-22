@@ -531,6 +531,7 @@
         "description": "Afficher l'icône de Prism dans la barre système."
       },
       "overlay": {
+        "accent": "Couleur d’accent de l’encoche",
         "animation": {
           "title": "Animation du texte",
           "generate": "Apparition progressive",

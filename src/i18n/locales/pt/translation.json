@@ -531,6 +531,7 @@
         "description": "Exibir o ícone do Prism na bandeja do sistema."
       },
       "overlay": {
+        "accent": "Cor de destaque do notch",
         "animation": {
           "title": "Animação do texto",
           "generate": "Aparecimento gradual",

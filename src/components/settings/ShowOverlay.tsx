@@ -4,10 +4,29 @@ import { Dropdown } from "../ui/Dropdown";
 import { SettingContainer } from "../ui/SettingContainer";
 import { useSettings } from "../../hooks/useSettings";
 import type {
+  OverlayAccent,
   OverlayPosition,
   OverlayStyle,
   TranscriptAnimation,
 } from "@/bindings";
+
+import { DEFAULT_OVERLAY_ACCENT, OVERLAY_ACCENTS } from "@/lib/overlayAccent";
+
+const accentOptions = Object.entries(OVERLAY_ACCENTS).map(
+  ([value, accent]) => ({
+    value,
+    label: (
+      <span className="flex items-center gap-2">
+        <span
+          className="size-3 shrink-0 rounded-full"
+          style={{ backgroundColor: accent.color }}
+          aria-hidden="true"
+        />
+        {accent.name}
+      </span>
+    ),
+  }),
+);
 
 interface ShowOverlayProps {
   descriptionMode?: "inline" | "tooltip";
@@ -90,7 +109,7 @@ export const ShowOverlay: React.FC<ShowOverlayProps> = React.memo(
           >
             <Dropdown
               options={animationOptions}
-              selectedValue={getSetting("transcript_animation") ?? "generate"}
+              selectedValue={getSetting("transcript_animation") ?? "sweep"}
               onSelect={(value) =>
                 updateSetting(
                   "transcript_animation",
@@ -98,6 +117,25 @@ export const ShowOverlay: React.FC<ShowOverlayProps> = React.memo(
                 )
               }
               disabled={isUpdating("transcript_animation")}
+            />
+          </SettingContainer>
+        )}
+
+        {selectedStyle !== "none" && (
+          <SettingContainer
+            title={t("settings.advanced.overlay.accent")}
+            descriptionMode={descriptionMode}
+            grouped={grouped}
+          >
+            <Dropdown
+              options={accentOptions}
+              selectedValue={
+                getSetting("overlay_accent") ?? DEFAULT_OVERLAY_ACCENT
+              }
+              onSelect={(value) =>
+                updateSetting("overlay_accent", value as OverlayAccent)
+              }
+              disabled={isUpdating("overlay_accent")}
             />
           </SettingContainer>
         )}

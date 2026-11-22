@@ -796,6 +796,18 @@ pub fn change_transcript_animation(
 
 #[tauri::command]
 #[specta::specta]
+pub fn change_overlay_accent(
+    app: AppHandle,
+    accent: settings::OverlayAccent,
+) -> Result<(), String> {
+    let mut current = settings::get_settings(&app);
+    current.overlay_accent = accent;
+    settings::write_settings(&app, current);
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn change_debug_mode_setting(app: AppHandle, enabled: bool) -> Result<(), String> {
     let mut settings = settings::get_settings(&app);
     settings.debug_mode = enabled;

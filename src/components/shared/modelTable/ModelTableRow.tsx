@@ -1,4 +1,5 @@
 import React from "react";
+import { LoaderCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { ProgressRing } from "@/components/shared/ProgressRing";
@@ -20,6 +21,7 @@ export interface RowDownload {
   state: "downloading" | "checking";
   /** 0–100. */
   percent: number;
+  indeterminate?: boolean;
 }
 
 interface ModelTableRowProps {
@@ -28,6 +30,7 @@ interface ModelTableRowProps {
   selected: boolean;
   /** First-column mark; replaced by a ring while downloading. */
   mark: React.ReactNode;
+  modelIcon?: React.ReactNode;
   /** Download progress, shown as a ring and on the second line. */
   download?: RowDownload | null;
   /** Second line; takes precedence over download progress and description. */
@@ -55,6 +58,7 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
   entry,
   selected,
   mark,
+  modelIcon,
   download,
   line,
   compact = false,
@@ -99,10 +103,17 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
     <span
       className={download.state === "checking" ? "grid animate-pulse" : "grid"}
     >
-      <ProgressRing
-        size={18}
-        value={download.state === "checking" ? 1 : download.percent / 100}
-      />
+      {download.indeterminate && download.state === "downloading" ? (
+        <LoaderCircle
+          className="size-[18px] animate-spin text-logo-primary motion-reduce:animate-none"
+          aria-hidden="true"
+        />
+      ) : (
+        <ProgressRing
+          size={18}
+          value={download.state === "checking" ? 1 : download.percent / 100}
+        />
+      )}
     </span>
   ) : (
     mark
@@ -165,6 +176,7 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
       </span>
       <span className="flex min-w-0 flex-col items-start">
         <span className="flex min-w-0 max-w-full items-center gap-[6px]">
+          {modelIcon}
           <b
             {...vt?.("n")}
             title={
@@ -198,8 +210,9 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
         {shownLine && (
           <span
             {...vt?.("d")}
+            role={download ? "status" : undefined}
             title={typeof shownLine === "string" ? shownLine : undefined}
-            className={`max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-ink-3 ${dim ? "opacity-60" : ""}`}
+            className={`max-w-full overflow-hidden text-ellipsis whitespace-nowrap ${download && compact ? "font-medium text-logo-primary" : "text-ink-3"} ${dim && !download ? "opacity-60" : ""}`}
           >
             {shownLine}
           </span>

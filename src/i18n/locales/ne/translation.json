@@ -531,6 +531,7 @@
         "description": "सिस्टम ट्रेमा Prism आइकन देखाउनुहोस्।"
       },
       "overlay": {
+        "accent": "नचको एक्सेन्ट रङ",
         "animation": {
           "title": "पाठ एनिमेसन",
           "generate": "क्रमशः देखिने",

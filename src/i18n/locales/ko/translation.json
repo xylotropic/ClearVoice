@@ -531,6 +531,7 @@
         "description": "시스템 트레이에 Prism 아이콘을 표시합니다."
       },
       "overlay": {
+        "accent": "노치 강조 색상",
         "animation": {
           "title": "텍스트 애니메이션",
           "generate": "순차적으로 나타나기",
