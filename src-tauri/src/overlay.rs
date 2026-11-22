@@ -48,7 +48,10 @@ tauri_panel! {
 // width from 172 (--ov-rest-w) to 216 (--ov-work-w) and expands from center, so
 // the window must fit the widest state plus a little slack. The longest notice
 // titles need nearly all of it.
+#[cfg(not(target_os = "macos"))]
 const OVERLAY_WIDTH: f64 = 266.0;
+#[cfg(target_os = "macos")]
+const OVERLAY_WIDTH: f64 = 350.0;
 const OVERLAY_HEIGHT: f64 = 50.0;
 
 // Actual is 394x118, just a little extra
@@ -87,8 +90,6 @@ fn overlay_dimensions(state: &str) -> (f64, f64) {
 static LAST_MIC_LEVEL_EMIT: AtomicU64 = AtomicU64::new(0);
 const EMIT_THROTTLE_MS: u64 = 33; // ~30 FPS
 
-#[cfg(target_os = "macos")]
-const OVERLAY_TOP_OFFSET: f64 = 46.0;
 #[cfg(any(target_os = "windows", target_os = "linux"))]
 const OVERLAY_TOP_OFFSET: f64 = 4.0;
 
@@ -254,11 +255,11 @@ fn is_mouse_within_monitor(
 
 /// Returns overlay position in logical coordinates (points on macOS).
 ///
-/// The Bottom anchor uses the macOS work area (visibleFrame) so the overlay
+/// The macOS anchors use the work area (visibleFrame) so the overlay
 /// tracks the Dock — above it when shown, at the screen edge when hidden.
 /// This relies on tauri 2.11's work_area.position.y fix (#14655), the same
-/// bug that led PR #969 to abandon work_area for full monitor bounds. Top and
-/// the other platforms keep full monitor bounds plus the fixed offsets
+/// bug that led PR #969 to abandon work_area for full monitor bounds. The
+/// other platforms keep full monitor bounds plus the fixed offsets
 /// (work_area is unreliable on Wayland; Windows' offset clears the taskbar).
 ///
 /// We must use LogicalPosition (not PhysicalPosition) because Tauri/tao
@@ -280,7 +281,18 @@ fn calculate_overlay_position(
 
     let x = monitor_x + (monitor_width - width) / 2.0;
     let y = match settings.overlay_position {
-        OverlayPosition::Top => monitor_y + OVERLAY_TOP_OFFSET,
+        OverlayPosition::Top => {
+            #[cfg(target_os = "macos")]
+            {
+                // The software panel attaches to the display edge. Its
+                // controls sit on the flanks, clear of the built-in camera.
+                monitor_y
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                monitor_y + OVERLAY_TOP_OFFSET
+            }
+        }
         OverlayPosition::Bottom => {
             // work_area.position shares monitor.position's global coordinate
             // space, so no monitor offset is added.

@@ -8,13 +8,8 @@ import { ModelTableRow } from "@/components/shared/modelTable/ModelTableRow";
 import { formatModelSize } from "@/lib/utils/format";
 import { useModelStore } from "@/stores/modelStore";
 import { useModelsLocked } from "@/stores/transcriptionJobsStore";
-import {
-  cancelDownload,
-  pickModel,
-  useIsTarget,
-  usePlace,
-  type Entry,
-} from "./modelEntries";
+import { useIsTarget, usePlace, type Entry } from "./modelEntries";
+import { cancelModelPick, pickModel } from "@/stores/modelPickStore";
 
 /** A Models page row: the shared table row plus use, stop and delete. */
 export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
@@ -92,12 +87,12 @@ export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
 
   // Pressing a download makes it the one to switch to when it's done.
   const act = () => {
-    if (asking || on || place === "loading") return;
+    if (asking || place === "loading") return;
     if (inert) {
       setTold(true);
       return;
     }
-    pickModel(entry.id);
+    void pickModel(entry.id);
   };
 
   const slotClass =
@@ -110,7 +105,7 @@ export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            cancelDownload(entry.id);
+            cancelModelPick(entry.id);
           }}
           title={label}
           aria-label={label}

@@ -1,4 +1,4 @@
-/* Handy Colors: every color the app uses comes from here. Pick by job:
+/* Prism palette: every color the app uses comes from here. Pick by job:
  * greys (ink-2, ink-3, line-strong, line, wash) for text, edges and fills;
  * logo-primary / background-ui for brand and primary actions; plum for keys
  * and picks (onboarding); moss / warning / error (+ -wash) for status.
@@ -10,13 +10,13 @@
      light/dark pair; the active tokens below and the `data-theme` overrides
      in App.css reference these, so a hex value lives in exactly one place. */
   --light-color-text: #0f0f0f;
-  --light-color-background: #fbfbfb;
-  --light-color-logo-primary: #faa2ca;
-  --light-color-logo-stroke: #382731;
+  --light-color-background: #f8faff;
+  --light-color-logo-primary: #8ec6ff;
+  --light-color-logo-stroke: #153562;
 
-  --dark-color-text: #fbfbfb;
-  --dark-color-background: #2c2b29;
-  --dark-color-logo-primary: #f28cbb;
+  --dark-color-text: #f8faff;
+  --dark-color-background: #141e31;
+  --dark-color-logo-primary: #69aeff;
 
   /* Status colors. Each has a -wash tint below. */
   --light-color-warning: #d97706;
@@ -24,7 +24,7 @@
   --dark-color-warning: #fbbf24;
   --dark-color-error: #f87171;
 
-  /* Success. Pink already means "recording", so it gets its own hue. */
+  /* Success. Blue already means "recording", so it gets its own hue. */
   --light-color-moss: #2f7d5b;
   --dark-color-moss: #86c9a4;
 
@@ -50,29 +50,29 @@
   --light-demo-wallpaper:
     radial-gradient(
       110% 80% at 90% 105%,
-      color-mix(in srgb, var(--light-color-logo-primary) 50%, #fbfbfb) 0%,
+      color-mix(in srgb, var(--light-color-logo-primary) 50%, #f8faff) 0%,
       transparent 60%
     ),
     radial-gradient(
       90% 80% at 5% -5%,
-      color-mix(in srgb, #c7b9ef 55%, #fbfbfb) 0%,
+      color-mix(in srgb, #b6d8ff 55%, #f8faff) 0%,
       transparent 62%
     ),
-    color-mix(in srgb, #e9e1f3 60%, #fbfbfb);
+    color-mix(in srgb, #e5eefc 60%, #f8faff);
   --dark-demo-wallpaper:
     radial-gradient(
       110% 80% at 90% 105%,
-      color-mix(in srgb, var(--dark-color-logo-primary) 26%, #1b1719) 0%,
+      color-mix(in srgb, var(--dark-color-logo-primary) 26%, #111a30) 0%,
       transparent 60%
     ),
     radial-gradient(
       90% 80% at 5% -5%,
-      color-mix(in srgb, #7c68c0 38%, #1b1719) 0%,
+      color-mix(in srgb, #3964ad 38%, #111a30) 0%,
       transparent 62%
     ),
-    #1f1a1e;
+    #131e34;
 
-  /* The wordmark. Dark mode outlines it in white to cut down on pinks. */
+  /* The wordmark. Dark mode outlines it in white to keep the wordmark legible. */
   --light-color-wordmark: var(--light-color-logo-primary);
   --light-color-wordmark-stroke: var(--light-color-logo-stroke);
   --dark-color-wordmark: var(--dark-color-logo-primary);
@@ -124,7 +124,7 @@
   );
 
   /* Tokens that do not change between light and dark */
-  --color-background-ui: #da5893;
+  --color-background-ui: #2478e4;
   --color-mid-gray: #808080;
 
   /* Active palette — defaults to light, follows the OS via the media query

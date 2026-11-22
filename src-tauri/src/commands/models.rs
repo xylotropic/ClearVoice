@@ -142,6 +142,14 @@ pub async fn delete_model(
     })
 }
 
+/// The pick can wait while a dictation or file transcription holds its model.
+#[tauri::command]
+#[specta::specta]
+pub fn can_switch_model(app_handle: AppHandle) -> bool {
+    let manager = app_handle.state::<Arc<TranscriptionManager>>();
+    !manager.job_active() && !crate::tray::dictation_in_progress(&app_handle)
+}
+
 /// Shared logic for switching the active model, used by both the Tauri command
 /// and the tray menu handler.
 ///
@@ -152,6 +160,9 @@ pub fn switch_active_model(app: &AppHandle, model_id: &str) -> Result<(), String
     let model_manager = app.state::<Arc<ModelManager>>();
     let transcription_manager = app.state::<Arc<TranscriptionManager>>();
     transcription_manager.ensure_model_unlocked()?;
+    if crate::tray::dictation_in_progress(app) {
+        return Err("The model can't change while dictation is active".to_string());
+    }
 
     // Atomically claim the loading slot — prevents concurrent model loads
     // from tray double-clicks or overlapping commands. The guard resets the

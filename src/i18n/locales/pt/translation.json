@@ -25,7 +25,7 @@
     "customModelDescription": "Não suportado oficialmente",
     "migration": {
       "title": "Seus modelos precisam de uma atualização",
-      "description": "O ClearVoice agora usa um tipo de modelo mais recente. Baixe a nova versão para continuar transcrevendo. As versões antigas serão removidas.",
+      "description": "O Prism agora usa um tipo de modelo mais recente. Baixe a nova versão para continuar transcrevendo. As versões antigas serão removidas.",
       "replaces": "Substitui {{name}}",
       "oldFormat": "Formato antigo",
       "failed": "Falha no download",
@@ -62,11 +62,11 @@
     "permissions": {
       "microphone": {
         "name": "Microfone",
-        "why": "Para o ClearVoice poder ouvir você. O áudio vira texto neste computador e nunca é enviado."
+        "why": "Para o Prism poder ouvir você. O áudio vira texto neste computador e nunca é enviado."
       },
       "accessibility": {
         "name": "Acessibilidade",
-        "why": "Para o seu atalho funcionar em todos os apps e o ClearVoice digitar o texto onde está o cursor."
+        "why": "Para o seu atalho funcionar em todos os apps e o Prism digitar o texto onde está o cursor."
       },
       "errors": {
         "checkFailed": "Erro ao verificar permissões. Por favor, tente novamente.",
@@ -80,12 +80,12 @@
       "openSettings": "Abrir ajustes",
       "allowed": "Permitido",
       "waiting": "Aguardando",
-      "turnOnMac": "Ative o ClearVoice em Ajustes do Sistema e depois volte aqui.",
+      "turnOnMac": "Ative o Prism em Ajustes do Sistema e depois volte aqui.",
       "turnOnWindows": "Ative o acesso ao microfone em Configurações do Windows e depois volte aqui.",
       "hintBoth": "Permita as duas para continuar",
       "hintMicrophone": "Permita o microfone para continuar",
       "welcomeBack": "Bem-vindo de volta. Retomando de onde você parou.",
-      "relaunch": "O atalho não responde depois disso? <relaunch>Reinicie o ClearVoice</relaunch> e você volta direto para cá."
+      "relaunch": "O atalho não responde depois disso? <relaunch>Reinicie o Prism</relaunch> e você volta direto para cá."
     },
     "shell": {
       "back": "Voltar",
@@ -96,11 +96,11 @@
       "title": "Fale em vez de digitar, em qualquer app",
       "subtitle": "Escolha os idiomas em que você vai ditar",
       "languagesLabel": "Idiomas",
-      "noMatch": "Nenhum idioma corresponde a “{{query}}”. Os modelos do ClearVoice cobrem cerca de 100 idiomas; há mais nos ajustes.",
+      "noMatch": "Nenhum idioma corresponde a “{{query}}”. Os modelos do Prism cobrem cerca de 100 idiomas; há mais nos ajustes.",
       "appLanguage": "Idioma do app",
       "menusIn": "Menus em <b>{{language}}</b>",
       "chinese": {
-        "question": "Você fala {{languages}}. Quais caracteres o ClearVoice deve escrever?",
+        "question": "Você fala {{languages}}. Quais caracteres o Prism deve escrever?",
         "label": "Caracteres chineses",
         "zh-Hans": "Simplificado",
         "zh-Hant": "Taiwan",
@@ -170,7 +170,7 @@
     },
     "try": {
       "title": "Experimente!",
-      "subtitle": "O ClearVoice está no canto para guiar você",
+      "subtitle": "O Prism está no canto para guiar você",
       "noteLabel": "Nota",
       "placeholder": "Nova nota",
       "hold": "Mantenha <keys/> pressionado e fale.",
@@ -198,14 +198,14 @@
     },
     "done": {
       "title": "Tudo pronto",
-      "subMac": "O ClearVoice agora está na barra de menus. Mantenha pressionado ou toque em <keys/> em qualquer app para falar.",
-      "subTray": "O ClearVoice agora está na bandeja do sistema. Mantenha pressionado ou toque em <keys/> em qualquer app para falar.",
+      "subMac": "O Prism agora está na barra de menus. Mantenha pressionado ou toque em <keys/> em qualquer app para falar.",
+      "subTray": "O Prism agora está na bandeja do sistema. Mantenha pressionado ou toque em <keys/> em qualquer app para falar.",
       "hint": "Você pode alterar isso depois nos Ajustes",
       "highFiveLabel": "Toca aqui",
-      "atLogin": "Abrir o ClearVoice quando eu entrar",
+      "atLogin": "Abrir o Prism quando eu entrar",
       "finish": "Concluído",
       "panel": {
-        "name": "ClearVoice",
+        "name": "Prism",
         "ready": "Pronto",
         "languages": "Idiomas",
         "model": "Modelo de fala",
@@ -330,7 +330,7 @@
     "general": {
       "title": "Geral",
       "shortcut": {
-        "title": "Atalhos do ClearVoice",
+        "title": "Atalhos do Prism",
         "description": "Configure atalhos de teclado para iniciar a gravação de voz para texto",
         "loading": "Carregando atalhos...",
         "none": "Nenhum atalho configurado",
@@ -372,7 +372,7 @@
       },
       "preferredLanguages": {
         "title": "Idiomas preferidos",
-        "description": "Os idiomas que você fala. O ClearVoice os usa para recomendar modelos.",
+        "description": "Os idiomas que você fala. O Prism os usa para recomendar modelos.",
         "noMatch": "Nenhum idioma corresponde a “{{query}}”",
         "weak": "Nenhum modelo reconhece bem {{languages}} ainda."
       },
@@ -399,17 +399,17 @@
         "fits": "Para os seus idiomas",
         "untested": "Não testados"
       },
-      "untestedNote": "Não testados com o ClearVoice. Podem ser mais lentos ou cometer mais erros.",
+      "untestedNote": "Não testados com o Prism. Podem ser mais lentos ou cometer mais erros.",
       "untestedHidden_one": "Mais {{count}} modelo não é otimizado para ditado. Busque para encontrá-lo.",
       "untestedHidden_other": "Mais {{count}} modelos não são otimizados para ditado. Busque para encontrar um.",
-      "emptyYours": "Nenhum modelo ainda. Escolha um abaixo: ele é baixado e o ClearVoice passa a usá-lo.",
+      "emptyYours": "Nenhum modelo ainda. Escolha um abaixo: ele é baixado e o Prism passa a usá-lo.",
       "showMore": "Mostrar mais {{count}}",
       "showFewer": "Mostrar menos",
       "download": "Baixar e usar",
       "downloadingThenUse": "{{percent}}% de {{total}}, depois troca",
       "loading": "Carregando…",
       "deleteAsk": "Excluir {{name}}? Libera {{size}}.",
-      "deleteAskActive": "Excluir {{name}}? O ClearVoice não poderá transcrever até você escolher outro.",
+      "deleteAskActive": "Excluir {{name}}? O Prism não poderá transcrever até você escolher outro.",
       "cancel": "Cancelar",
       "deleteModel": "Excluir {{name}}",
       "cancelDownload": "Parar o download de {{name}}",
@@ -423,14 +423,14 @@
         "marks": "? ainda não foi medido. — não entende esse idioma."
       },
       "retiredNotice": {
-        "title": "Os modelos antigos não funcionam mais com o ClearVoice",
+        "title": "Os modelos antigos não funcionam mais com o Prism",
         "description": "Eles estão ocupando {{size}} no seu computador.",
         "delete": "Excluir modelos",
         "deleteFailed": "Não foi possível excluir alguns modelos antigos. Verifique o log para mais detalhes."
       },
       "rescan": {
         "label": "Reescanear",
-        "tooltip": "Reescaneia em busca de modelos adicionados à pasta de modelos ou ao cache do Hugging Face fora do ClearVoice"
+        "tooltip": "Reescaneia em busca de modelos adicionados à pasta de modelos ou ao cache do Hugging Face fora do Prism"
       }
     },
     "languages": {
@@ -500,11 +500,11 @@
       },
       "autostart": {
         "label": "Iniciar na Inicialização",
-        "description": "Iniciar automaticamente o ClearVoice quando você fizer login no seu computador."
+        "description": "Iniciar automaticamente o Prism quando você fizer login no seu computador."
       },
       "showTrayIcon": {
         "label": "Mostrar ícone na bandeja",
-        "description": "Exibir o ícone do ClearVoice na bandeja do sistema."
+        "description": "Exibir o ícone do Prism na bandeja do sistema."
       },
       "overlay": {
         "style": {
@@ -741,7 +741,7 @@
       },
       "updateChecks": {
         "label": "Verificar Atualizações",
-        "description": "Verificar automaticamente novas versões do ClearVoice",
+        "description": "Verificar automaticamente novas versões do Prism",
         "lockedDescription": "Desativado pela configuração do sistema (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -847,7 +847,7 @@
       },
       "keyboardDiagnostic": {
         "title": "Diagnóstico do teclado",
-        "description": "Verifica se os eventos de teclado chegam ao ClearVoice. Apenas a contagem de eventos é registrada — nunca quais teclas você pressiona.",
+        "description": "Verifica se os eventos de teclado chegam ao Prism. Apenas a contagem de eventos é registrada — nunca quais teclas você pressiona.",
         "run": "Executar diagnóstico de 10 s",
         "running": "Ouvindo… pressione seu atalho algumas vezes (ex.: Option+Space)",
         "secureInputLabel": "Secure Input",
@@ -861,7 +861,7 @@
         "mouse": "Mouse",
         "verdictBlocked": "O Secure Input está bloqueando os eventos de tecla — atalhos que incluem uma tecla normal não funcionam até que isso seja resolvido.",
         "verdictSuspicious": "Chegaram eventos de modificadores, mas nenhum evento de tecla — algo está suprimindo as teclas mesmo com o Secure Input indicando desativado. Por favor, relate isso no GitHub.",
-        "verdictOk": "Os eventos de tecla estão chegando normalmente ao ClearVoice.",
+        "verdictOk": "Os eventos de tecla estão chegando normalmente ao Prism.",
         "verdictNoEvents": "Nenhum evento capturado — você pressionou alguma tecla durante o teste?",
         "failed": "Falha no diagnóstico: {{error}}"
       }
@@ -870,15 +870,15 @@
       "title": "Sobre",
       "version": {
         "title": "Versão",
-        "description": "Versão atual do ClearVoice"
+        "description": "Versão atual do Prism"
       },
       "whatsNewUpdates": {
         "label": "Mostrar novidades",
-        "description": "Mostrar notas de versão após atualizações do ClearVoice"
+        "description": "Mostrar notas de versão após atualizações do Prism"
       },
       "appDataDirectory": {
         "title": "Diretório de Dados do App",
-        "description": "Local onde o ClearVoice armazena seus dados"
+        "description": "Local onde o Prism armazena seus dados"
       },
       "sourceCode": {
         "title": "Código Fonte",
@@ -887,7 +887,7 @@
       },
       "supportDevelopment": {
         "title": "Apoiar o Desenvolvimento",
-        "description": "Ajude-nos a continuar construindo o ClearVoice",
+        "description": "Ajude-nos a continuar construindo o Prism",
         "button": "Doar"
       },
       "acknowledgments": {
@@ -895,7 +895,7 @@
         "ggml": {
           "title": "ggml",
           "description": "Inferência de alto desempenho do modelo de reconhecimento automático de fala Whisper da OpenAI",
-          "details": "O ClearVoice usa ggml para processamento rápido e local de fala para texto. Agradecemos ao incrível trabalho de Georgi Gerganov e colaboradores."
+          "details": "O Prism usa ggml para processamento rápido e local de fala para texto. Agradecemos ao incrível trabalho de Georgi Gerganov e colaboradores."
         }
       }
     }
@@ -916,7 +916,7 @@
     "portableUpdateBrowseButton": "Abrir GitHub Releases"
   },
   "whatsNew": {
-    "title": "Novidades no ClearVoice v{{version}}"
+    "title": "Novidades no Prism v{{version}}"
   },
   "common": {
     "playbackPosition": "Posição de reprodução",
@@ -943,7 +943,7 @@
     "microphoneSilentTitle": "O microfone está mudo",
     "microphoneSilent": "Seu microfone enviou apenas silêncio. Verifique se ele não está silenciado ou escolha outro microfone em Configurações.",
     "recordingFailedTitle": "Falha ao iniciar a gravação",
-    "modelLoadFailed": "O ClearVoice não conseguiu carregar este modelo. Tente novamente ou escolha outro.",
+    "modelLoadFailed": "O Prism não conseguiu carregar este modelo. Tente novamente ou escolha outro.",
     "modelLoadFailedTitle": "Falha ao carregar o modelo",
     "noModelSelected": "Baixe ou escolha um modelo em Configurações > Modelos.",
     "noModelSelectedTitle": "Nenhum modelo selecionado",
@@ -951,7 +951,7 @@
     "pasteFailedTitle": "Falha ao colar o texto",
     "pasteFailed": "Não foi possível colar o texto no aplicativo ativo.",
     "pasteBlockedElevatedTitle": "Colagem bloqueada por app admin",
-    "pasteBlockedElevated": "O aplicativo ativo está sendo executado como administrador, então o ClearVoice não consegue colar nele. Você pode copiar a transcrição do Histórico.",
+    "pasteBlockedElevated": "O aplicativo ativo está sendo executado como administrador, então o Prism não consegue colar nele. Você pode copiar a transcrição do Histórico.",
     "postProcessFailedTitle": "Colado sem pós-processamento",
     "postProcessFailed": "O pós-processamento não terminou, então a transcrição foi colada como está.",
     "filePostProcessFailedTitle": "Transcrito sem pós-processamento",
@@ -968,11 +968,11 @@
   },
   "appLanguage": {
     "title": "Idioma da Aplicação",
-    "description": "Alterar o idioma da interface do ClearVoice"
+    "description": "Alterar o idioma da interface do Prism"
   },
   "theme": {
     "title": "Tema do aplicativo",
-    "description": "Escolha se o ClearVoice segue o tema do sistema ou permanece claro ou escuro",
+    "description": "Escolha se o Prism segue o tema do sistema ou permanece claro ou escuro",
     "options": {
       "system": "Sistema",
       "light": "Claro",

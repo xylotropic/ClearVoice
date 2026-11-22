@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "ClearVoice",
+  "productName": "Prism",
   "version": "0.10.1",
   "identifier": "io.github.xylotropic.clearvoice",
   "build": {

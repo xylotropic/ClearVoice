@@ -25,7 +25,7 @@
     "customModelDescription": "Resmi olarak desteklenmiyor",
     "migration": {
       "title": "Modellerinizin güncellenmesi gerekiyor",
-      "description": "ClearVoice artık daha yeni bir model türü kullanıyor. Transkripsiyona devam etmek için yeni sürümü indirin. Eski sürümler kaldırılacak.",
+      "description": "Prism artık daha yeni bir model türü kullanıyor. Transkripsiyona devam etmek için yeni sürümü indirin. Eski sürümler kaldırılacak.",
       "replaces": "{{name}} yerine geçer",
       "oldFormat": "Eski format",
       "failed": "İndirme başarısız oldu",
@@ -62,11 +62,11 @@
     "permissions": {
       "microphone": {
         "name": "Mikrofon",
-        "why": "ClearVoice sizi duyabilsin diye. Ses bu bilgisayarda metne dönüştürülür, hiçbir yere yüklenmez."
+        "why": "Prism sizi duyabilsin diye. Ses bu bilgisayarda metne dönüştürülür, hiçbir yere yüklenmez."
       },
       "accessibility": {
         "name": "Erişilebilirlik",
-        "why": "Kısayolunuz her uygulamada çalışsın ve ClearVoice metni imlecinizin bulunduğu yere yazabilsin diye."
+        "why": "Kısayolunuz her uygulamada çalışsın ve Prism metni imlecinizin bulunduğu yere yazabilsin diye."
       },
       "errors": {
         "checkFailed": "İzinler kontrol edilemedi. Lütfen tekrar deneyin.",
@@ -80,12 +80,12 @@
       "openSettings": "Ayarları aç",
       "allowed": "İzin verildi",
       "waiting": "Bekleniyor",
-      "turnOnMac": "Sistem Ayarları'nda ClearVoice'yi açın, sonra buraya dönün.",
+      "turnOnMac": "Sistem Ayarları'nda Prism'yi açın, sonra buraya dönün.",
       "turnOnWindows": "Windows Ayarları'nda mikrofon erişimini açın, sonra buraya dönün.",
       "hintBoth": "Devam etmek için ikisine de izin verin",
       "hintMicrophone": "Devam etmek için mikrofona izin verin",
       "welcomeBack": "Tekrar hoş geldiniz. Kaldığınız yerden devam ediyoruz.",
-      "relaunch": "Bundan sonra kısayol yanıt vermiyor mu? <relaunch>ClearVoice'yi yeniden başlatın</relaunch>, doğrudan buraya döneceksiniz."
+      "relaunch": "Bundan sonra kısayol yanıt vermiyor mu? <relaunch>Prism'yi yeniden başlatın</relaunch>, doğrudan buraya döneceksiniz."
     },
     "shell": {
       "back": "Geri",
@@ -96,11 +96,11 @@
       "title": "Yazmak yerine konuşun, her uygulamada",
       "subtitle": "Konuşacağınız dilleri seçin",
       "languagesLabel": "Diller",
-      "noMatch": "“{{query}}” ile eşleşen dil yok. ClearVoice'nin modelleri yaklaşık 100 dili kapsıyor; daha fazlası ayarlarda.",
+      "noMatch": "“{{query}}” ile eşleşen dil yok. Prism'nin modelleri yaklaşık 100 dili kapsıyor; daha fazlası ayarlarda.",
       "appLanguage": "Uygulama dili",
       "menusIn": "Menüler <b>{{language}}</b> dilinde",
       "chinese": {
-        "question": "{{languages}} konuşuyorsunuz. ClearVoice hangi karakterleri yazsın?",
+        "question": "{{languages}} konuşuyorsunuz. Prism hangi karakterleri yazsın?",
         "label": "Çince karakterler",
         "zh-Hans": "Basitleştirilmiş",
         "zh-Hant": "Tayvan",
@@ -170,7 +170,7 @@
     },
     "try": {
       "title": "Bir deneyin!",
-      "subtitle": "ClearVoice köşede, size yol göstermek için hazır",
+      "subtitle": "Prism köşede, size yol göstermek için hazır",
       "noteLabel": "Not",
       "placeholder": "Yeni not",
       "hold": "<keys/> tuşlarını basılı tutun ve konuşun.",
@@ -198,14 +198,14 @@
     },
     "done": {
       "title": "Hazırsınız",
-      "subMac": "ClearVoice artık menü çubuğunuzda. Konuşmak için herhangi bir uygulamada <keys/> tuşlarını basılı tutun veya dokunun.",
-      "subTray": "ClearVoice artık sistem tepsinizde. Konuşmak için herhangi bir uygulamada <keys/> tuşlarını basılı tutun veya dokunun.",
+      "subMac": "Prism artık menü çubuğunuzda. Konuşmak için herhangi bir uygulamada <keys/> tuşlarını basılı tutun veya dokunun.",
+      "subTray": "Prism artık sistem tepsinizde. Konuşmak için herhangi bir uygulamada <keys/> tuşlarını basılı tutun veya dokunun.",
       "hint": "Bunları daha sonra Ayarlar'dan değiştirebilirsiniz",
       "highFiveLabel": "Çak bir beşlik",
-      "atLogin": "Oturum açtığımda ClearVoice'yi başlat",
+      "atLogin": "Oturum açtığımda Prism'yi başlat",
       "finish": "Bitti",
       "panel": {
-        "name": "ClearVoice",
+        "name": "Prism",
         "ready": "Hazır",
         "languages": "Diller",
         "model": "Konuşma modeli",
@@ -330,7 +330,7 @@
     "general": {
       "title": "Genel",
       "shortcut": {
-        "title": "ClearVoice Kısayolları",
+        "title": "Prism Kısayolları",
         "description": "Sesle yazma kaydını başlatmak için klavye kısayollarını yapılandırın",
         "loading": "Kısayollar yükleniyor...",
         "none": "Kısayol yapılandırılmadı",
@@ -372,7 +372,7 @@
       },
       "preferredLanguages": {
         "title": "Tercih Edilen Diller",
-        "description": "Konuştuğunuz diller. ClearVoice bunları model önermek için kullanır.",
+        "description": "Konuştuğunuz diller. Prism bunları model önermek için kullanır.",
         "noMatch": "“{{query}}” ile eşleşen dil yok",
         "weak": "Henüz hiçbir model {{languages}} dilini iyi tanımıyor."
       },
@@ -399,17 +399,17 @@
         "fits": "Dilleriniz için",
         "untested": "Test edilmemiş"
       },
-      "untestedNote": "ClearVoice ile test edilmedi. Daha yavaş olabilir veya daha fazla hata yapabilir.",
+      "untestedNote": "Prism ile test edilmedi. Daha yavaş olabilir veya daha fazla hata yapabilir.",
       "untestedHidden_one": "{{count}} model daha yazdırma için ayarlanmamış. Bulmak için arama yapın.",
       "untestedHidden_other": "{{count}} model daha yazdırma için ayarlanmamış. Bulmak için arama yapın.",
-      "emptyYours": "Henüz model yok. Aşağıdan birini seçin: iner, sonra ClearVoice onu kullanır.",
+      "emptyYours": "Henüz model yok. Aşağıdan birini seçin: iner, sonra Prism onu kullanır.",
       "showMore": "{{count}} tane daha göster",
       "showFewer": "Daha az göster",
       "download": "İndir ve kullan",
       "downloadingThenUse": "{{total}} içinden %{{percent}}, sonra geçilir",
       "loading": "Yükleniyor…",
       "deleteAsk": "{{name}} silinsin mi? {{size}} yer açılır.",
-      "deleteAskActive": "{{name}} silinsin mi? Başka bir model seçene kadar ClearVoice transkripsiyon yapamaz.",
+      "deleteAskActive": "{{name}} silinsin mi? Başka bir model seçene kadar Prism transkripsiyon yapamaz.",
       "cancel": "İptal",
       "deleteModel": "{{name}} modelini sil",
       "cancelDownload": "{{name}} indirmesini durdur",
@@ -423,14 +423,14 @@
         "marks": "? henüz ölçülmedi. — o dili duymaz."
       },
       "retiredNotice": {
-        "title": "Eski modeller artık ClearVoice ile çalışmıyor",
+        "title": "Eski modeller artık Prism ile çalışmıyor",
         "description": "Bilgisayarınızda {{size}} yer kaplıyorlar.",
         "delete": "Modelleri sil",
         "deleteFailed": "Bazı eski modeller silinemedi. Ayrıntılar için günlüğe bakın."
       },
       "rescan": {
         "label": "Yeniden Tara",
-        "tooltip": "ClearVoice dışında modeller klasörüne veya Hugging Face önbelleğine eklenen modelleri yeniden tara"
+        "tooltip": "Prism dışında modeller klasörüne veya Hugging Face önbelleğine eklenen modelleri yeniden tara"
       }
     },
     "languages": {
@@ -500,11 +500,11 @@
       },
       "autostart": {
         "label": "Başlangıçta Çalıştır",
-        "description": "Bilgisayara giriş yaptığınızda ClearVoice otomatik olarak başlatılır."
+        "description": "Bilgisayara giriş yaptığınızda Prism otomatik olarak başlatılır."
       },
       "showTrayIcon": {
         "label": "Tepsi Simgesini Göster",
-        "description": "ClearVoice simgesini sistem tepsisinde göster."
+        "description": "Prism simgesini sistem tepsisinde göster."
       },
       "overlay": {
         "style": {
@@ -741,7 +741,7 @@
       },
       "updateChecks": {
         "label": "Güncellemeleri Kontrol Et",
-        "description": "ClearVoice için yeni sürümleri otomatik olarak kontrol eder",
+        "description": "Prism için yeni sürümleri otomatik olarak kontrol eder",
         "lockedDescription": "Sistem yapılandırması tarafından devre dışı bırakıldı (HANDY_DISABLE_UPDATER)"
       },
       "whatsNewPreview": {
@@ -847,7 +847,7 @@
       },
       "keyboardDiagnostic": {
         "title": "Klavye Tanılaması",
-        "description": "Klavye olaylarının ClearVoice'ye ulaşıp ulaşmadığını denetler. Yalnızca olay sayıları kaydedilir — hangi tuşlara bastığınız asla kaydedilmez.",
+        "description": "Klavye olaylarının Prism'ye ulaşıp ulaşmadığını denetler. Yalnızca olay sayıları kaydedilir — hangi tuşlara bastığınız asla kaydedilmez.",
         "run": "10 sn'lik tanılamayı çalıştır",
         "running": "Dinleniyor… kısayolunuza birkaç kez basın (ör. Option+Space)",
         "secureInputLabel": "Secure Input",
@@ -861,7 +861,7 @@
         "mouse": "Fare",
         "verdictBlocked": "Secure Input tuş olaylarını engelliyor — normal tuş içeren kısayollar bu sorun çözülene kadar çalışamaz.",
         "verdictSuspicious": "Değiştirici olayları geldi ancak hiç tuş olayı gelmedi — Secure Input devre dışı görünmesine rağmen bir şey tuşları bastırıyor. Lütfen bunu GitHub'da bildirin.",
-        "verdictOk": "Tuş olayları ClearVoice'ye normal şekilde ulaşıyor.",
+        "verdictOk": "Tuş olayları Prism'ye normal şekilde ulaşıyor.",
         "verdictNoEvents": "Hiç olay yakalanmadı — test sırasında herhangi bir tuşa bastınız mı?",
         "failed": "Tanılama başarısız: {{error}}"
       }
@@ -870,15 +870,15 @@
       "title": "Hakkında",
       "version": {
         "title": "Sürüm",
-        "description": "ClearVoice'nin mevcut sürümü"
+        "description": "Prism'nin mevcut sürümü"
       },
       "whatsNewUpdates": {
         "label": "Yenilikleri Göster",
-        "description": "ClearVoice güncellemelerinden sonra sürüm notlarını göster"
+        "description": "Prism güncellemelerinden sonra sürüm notlarını göster"
       },
       "appDataDirectory": {
         "title": "Uygulama Veri Dizini",
-        "description": "ClearVoice'nin verilerini sakladığı konum"
+        "description": "Prism'nin verilerini sakladığı konum"
       },
       "sourceCode": {
         "title": "Kaynak Kodu",
@@ -887,7 +887,7 @@
       },
       "supportDevelopment": {
         "title": "Geliştirmeyi Destekle",
-        "description": "ClearVoice'yi geliştirmeye devam etmemize yardımcı olun",
+        "description": "Prism'yi geliştirmeye devam etmemize yardımcı olun",
         "button": "Bağış Yap"
       },
       "acknowledgments": {
@@ -895,7 +895,7 @@
         "ggml": {
           "title": "ggml",
           "description": "Cihaz üzerinde makine öğrenmesi çıkarımı için yüksek performanslı tensör kütüphanesi",
-          "details": "ClearVoice'nin yerel konuşmadan metne dönüştürme özelliği transcribe.cpp ve ggml üzerine kuruludur. Georgi Gerganov'a ve katkıda bulunanlara harika çalışmaları için teşekkür ederiz."
+          "details": "Prism'nin yerel konuşmadan metne dönüştürme özelliği transcribe.cpp ve ggml üzerine kuruludur. Georgi Gerganov'a ve katkıda bulunanlara harika çalışmaları için teşekkür ederiz."
         }
       }
     }
@@ -916,7 +916,7 @@
     "portableUpdateBrowseButton": "GitHub Releases’i aç"
   },
   "whatsNew": {
-    "title": "ClearVoice v{{version}} yenilikleri"
+    "title": "Prism v{{version}} yenilikleri"
   },
   "common": {
     "playbackPosition": "Oynatma konumu",
@@ -943,7 +943,7 @@
     "microphoneSilentTitle": "Mikrofon sessiz",
     "microphoneSilent": "Mikrofonunuz yalnızca sessizlik gönderdi. Sesinin kapalı olmadığını kontrol edin veya Ayarlar'dan başka bir mikrofon seçin.",
     "recordingFailedTitle": "Kayıt başlatılamadı",
-    "modelLoadFailed": "ClearVoice bu modeli yükleyemedi. Yeniden deneyin veya başka bir model seçin.",
+    "modelLoadFailed": "Prism bu modeli yükleyemedi. Yeniden deneyin veya başka bir model seçin.",
     "modelLoadFailedTitle": "Model yüklenemedi",
     "noModelSelected": "Ayarlar > Modeller bölümünden bir model indirin veya seçin.",
     "noModelSelectedTitle": "Model seçilmedi",
@@ -951,7 +951,7 @@
     "pasteFailedTitle": "Metin yapıştırılamadı",
     "pasteFailed": "Metin etkin uygulamaya yapıştırılamadı.",
     "pasteBlockedElevatedTitle": "Yapıştırma engellendi",
-    "pasteBlockedElevated": "Etkin uygulama yönetici olarak çalışıyor, bu yüzden ClearVoice içine yapıştıramıyor. Metni Geçmiş'ten kopyalayabilirsiniz.",
+    "pasteBlockedElevated": "Etkin uygulama yönetici olarak çalışıyor, bu yüzden Prism içine yapıştıramıyor. Metni Geçmiş'ten kopyalayabilirsiniz.",
     "postProcessFailedTitle": "Son işlem olmadan yapıştırıldı",
     "postProcessFailed": "Son işlem tamamlanmadı, bu yüzden metin olduğu gibi yapıştırıldı.",
     "filePostProcessFailedTitle": "Son işlem olmadan yazıya döküldü",
@@ -968,11 +968,11 @@
   },
   "appLanguage": {
     "title": "Uygulama Dili",
-    "description": "ClearVoice arayüzünün dilini değiştirin"
+    "description": "Prism arayüzünün dilini değiştirin"
   },
   "theme": {
     "title": "Uygulama Teması",
-    "description": "ClearVoice'nin sistem temasını izlemesini ya da açık veya koyu kalmasını seçin",
+    "description": "Prism'nin sistem temasını izlemesini ya da açık veya koyu kalmasını seçin",
     "options": {
       "system": "Sistem",
       "light": "Açık",

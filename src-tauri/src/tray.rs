@@ -616,9 +616,9 @@ pub fn tray_tooltip() -> String {
 
 fn version_label() -> String {
     if cfg!(debug_assertions) {
-        format!("ClearVoice v{} (Dev)", env!("CARGO_PKG_VERSION"))
+        format!("Prism v{} (Dev)", env!("CARGO_PKG_VERSION"))
     } else {
-        format!("ClearVoice v{}", env!("CARGO_PKG_VERSION"))
+        format!("Prism v{}", env!("CARGO_PKG_VERSION"))
     }
 }
 

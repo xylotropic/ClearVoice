@@ -11,6 +11,7 @@ import {
 } from "@/components/shared/modelTable/ModelTable";
 import RetiredModelsNotice from "./RetiredModelsNotice";
 import { ModelRow } from "./ModelRow";
+import { ModelReadySweep } from "./ModelReadySweep";
 import { Legend } from "./Legend";
 import { useModelEntries } from "./modelEntries";
 
@@ -139,7 +140,8 @@ export const ModelsSettings: React.FC<ModelsSettingsProps> = ({
     <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col">
       {/* The title, and across from it where to change the languages the
           grades are for. */}
-      <div className="mb-[16px] flex flex-none items-center justify-between gap-[12px] px-[12px]">
+      <div className="relative mb-[16px] flex flex-none items-center justify-between gap-[12px] px-[12px]">
+        <ModelReadySweep />
         <h1 className="text-xl font-semibold">{t("settings.models.title")}</h1>
         {onChangeLanguages && (
           <button

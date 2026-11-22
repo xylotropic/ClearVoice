@@ -782,6 +782,7 @@ pub fn run(cli_args: CliArgs) {
             commands::models::get_retired_models,
             commands::models::delete_retired_model,
             commands::models::cancel_download,
+            commands::models::can_switch_model,
             commands::models::set_active_model,
             commands::models::get_current_model,
             commands::models::get_transcription_model_status,
@@ -1018,7 +1019,7 @@ pub fn run(cli_args: CliArgs) {
             // for portable mode (redirects WebView2 cache to portable Data dir)
             let mut win_builder =
                 tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("/".into()))
-                    .title("ClearVoice")
+                    .title("Prism")
                     .inner_size(utils::MAIN_WINDOW_SIZE.0, utils::MAIN_WINDOW_SIZE.1)
                     .min_inner_size(utils::MAIN_WINDOW_SIZE.0, utils::MAIN_WINDOW_SIZE.1)
                     .resizable(true)

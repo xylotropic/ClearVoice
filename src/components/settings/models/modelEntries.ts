@@ -1,9 +1,8 @@
 /** Models page data: the app's model list joined to the catalog by repo. */
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { create } from "zustand";
 import { useModelStore } from "@/stores/modelStore";
-import { areModelsLocked } from "@/stores/transcriptionJobsStore";
+import { useModelPickStore } from "@/stores/modelPickStore";
 import { useSettings } from "@/hooks/useSettings";
 import { useModelCatalog } from "@/hooks/useModelCatalog";
 import { averageError, type Grading } from "@/lib/models/grading";
@@ -106,18 +105,6 @@ export const useModelEntries = () => {
 
 /* ---------------- where a model is, and what pressing it does ---------------- */
 
-interface PageState {
-  /** Loading into memory after it was picked. */
-  switching: string | null;
-  /** A download that becomes the model in use when it's done. */
-  target: string | null;
-}
-
-const usePageState = create<PageState>(() => ({
-  switching: null,
-  target: null,
-}));
-
 /** Where a model is: in use, on disk, on its way, or only in the catalog. */
 export type Place =
   | "active"
@@ -128,7 +115,7 @@ export type Place =
   | "remote";
 
 export const usePlace = (id: string): Place => {
-  const switching = usePageState((s) => s.switching === id);
+  const switching = useModelPickStore((s) => s.switching === id);
   const state = useModelStore((s) => downloadStateOf(s, id).state);
   const current = useModelStore((s) => s.currentModel === id);
   if (switching) return "loading";
@@ -138,61 +125,5 @@ export const usePlace = (id: string): Place => {
   return current ? "active" : "ready";
 };
 
-export const useIsTarget = (id: string) => usePageState((s) => s.target === id);
-
-const select = async (id: string) => {
-  // A file is transcribing, so the model in use can't change.
-  if (areModelsLocked()) {
-    usePageState.setState({ target: null });
-    return;
-  }
-  usePageState.setState({ switching: id, target: null });
-  try {
-    await useModelStore.getState().selectModel(id);
-  } finally {
-    if (usePageState.getState().switching === id)
-      usePageState.setState({ switching: null });
-  }
-};
-
-const isOnDisk = (id: string) =>
-  !!useModelStore.getState().models.find((m) => m.id === id)?.is_downloaded;
-
-/** Waits for a download started elsewhere; resolves to whether it's on disk. */
-const whenDownloadEnds = (id: string) =>
-  new Promise<boolean>((resolve) => {
-    const unsubscribe = useModelStore.subscribe(
-      (s) => id in s.downloadingModels || id in s.verifyingModels,
-      async (inFlight) => {
-        if (inFlight) return;
-        unsubscribe();
-        // The flag clears before the list reloads, so reload it first.
-        await useModelStore.getState().loadModels();
-        resolve(isOnDisk(id));
-      },
-    );
-  });
-
-/** Use a model, downloading it first if needed. The last one pressed wins. */
-export const pickModel = (id: string) => {
-  const store = useModelStore.getState();
-  if (isOnDisk(id)) {
-    void select(id);
-    return;
-  }
-  // Locked: download it, but don't promise to switch to it.
-  if (!areModelsLocked()) usePageState.setState({ target: id });
-  const done =
-    id in store.downloadingModels
-      ? whenDownloadEnds(id)
-      : store.downloadModel(id);
-  void done.then((ok) => {
-    if (ok && usePageState.getState().target === id) void select(id);
-  });
-};
-
-export const cancelDownload = (id: string) => {
-  if (usePageState.getState().target === id)
-    usePageState.setState({ target: null });
-  void useModelStore.getState().cancelDownload(id);
-};
+export const useIsTarget = (id: string) =>
+  useModelPickStore((s) => s.target === id);

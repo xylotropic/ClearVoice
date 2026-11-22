@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
 import { LiveTranscript } from "./LiveTranscript";
+import prismMark from "@/assets/prism-mark.webp";
 import { commands, events } from "@/bindings";
 import type {
   Notice,
@@ -31,6 +32,7 @@ const isNoticeState = (state: OverlayState) =>
 // Number of reactive bars in the waveform (the simple, smoothed style shared by
 // every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
 const WAVE_BARS = 9;
+const IS_MAC = navigator.userAgent.includes("Macintosh");
 
 // Only call out a model load in the Live preview once it has run this long.
 // Warm loads finish in well under this (~0.2s on Apple Silicon, ~1.5s on a
@@ -76,7 +78,9 @@ const RecordingOverlay: React.FC = () => {
   const [session, setSession] = useState(0);
   // Overlay placement (top vs bottom of the screen). The Live panel grows downward
   // from a top overlay (oldest line under the pill) and upward from a bottom one.
-  const [position, setPosition] = useState<"top" | "bottom">("bottom");
+  const [position, setPosition] = useState<"top" | "bottom">(
+    IS_MAC ? "top" : "bottom",
+  );
   // True once live text overflows the cap. A top overlay fades its top edge only
   // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
@@ -270,6 +274,8 @@ const RecordingOverlay: React.FC = () => {
 
   if (!isVisible && !shownNotice) return null;
 
+  const stageClass = `ov-stage ${position}${IS_MAC && position === "top" ? " docked" : ""}`;
+
   // Re-pin when the user is within ~a line of the bottom; unpin otherwise.
   const handleStreamScroll = () => {
     const el = capRef.current;
@@ -301,7 +307,7 @@ const RecordingOverlay: React.FC = () => {
   const cancelBtn = (
     <button
       className="sx"
-      aria-label="cancel"
+      aria-label={t("settings.general.shortcut.bindings.cancel.name")}
       onClick={() => commands.cancelOperation()}
     >
       <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -318,9 +324,15 @@ const RecordingOverlay: React.FC = () => {
   // dot (left) | waveform (center) | timer + cancel (right) — same structure for
   // pill & panel, so the Live morph is a pure width change.
   const listeningRow = (showTimer: boolean, showCancel: boolean) => (
-    <div className="sbase">
+    <div className="sbase listening">
       <div className="sbase-l">
-        <span className={`sdot ${captureReady ? "ready" : "arming"}`} />
+        <img
+          className={`smark ${captureReady ? "ready" : "arming"}`}
+          src={prismMark}
+          width={19}
+          height={19}
+          alt=""
+        />
       </div>
       {waveform}
       <div className="sbase-r">
@@ -382,7 +394,7 @@ const RecordingOverlay: React.FC = () => {
     const collapsed = working && !hasText;
 
     return (
-      <div dir={direction} className={`ov-stage ${position}`}>
+      <div dir={direction} className={stageClass}>
         {noticeProbe}
         <div
           key={session}
@@ -441,7 +453,7 @@ const RecordingOverlay: React.FC = () => {
   return (
     <div
       dir={direction}
-      className={`ov-stage ${position} ov-fade ${isVisible ? "show" : ""}`}
+      className={`${stageClass} ov-fade ${isVisible ? "show" : ""}`}
     >
       {noticeProbe}
       <div
