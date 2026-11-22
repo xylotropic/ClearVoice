@@ -1,12 +1,28 @@
 # Prism
 
-Prism is an MIT-licensed macOS dictation app based on [Handy](https://github.com/cjpais/Handy). Hold the shortcut to dictate, watch new words appear in a virtual notch at the top of your display, and release to paste the finished text once. Press Escape during recording to cancel.
+Prism is an MIT-licensed macOS dictation app based on [Handy](https://github.com/cjpais/Handy). Hold the shortcut to dictate, watch new words appear in a virtual notch at the top of your display, and release to paste the finished text once. Press Escape during recording to cancel, or click **Undo** in the notice to recover that take.
+
+[Download Prism for Apple silicon](https://prism-dictation.vercel.app/Prism-Apple-Silicon.dmg)
+
+![Prism’s black recording notch with a blue waveform and live transcript](docs/prism/notch.webp)
+
+## See Prism in action
+
+**Home** shows daily and total words, your streak, estimated time saved, and a calendar of your activity. The screenshot uses sample data.
+
+![Prism’s Home page with sample activity and a blue usage calendar](docs/prism/home.webp)
+
+**Models** lists what is installed, what supports Live preview, and what is downloading.
+
+![Prism’s model picker with Parakeet selected and Qwen downloading](docs/prism/models.webp)
 
 ## Set up
 
 1. Open Prism and grant Microphone and Accessibility access when prompted.
 2. Download a streaming model during setup. For English, start with **Parakeet Unified English 0.6B**. For other languages, choose a compatible streaming model in Models. A batch-only model shows recording status during dictation and transcribes after release.
 3. After setup, hold **Option–Space** in an editable field, speak, and release. Record a different shortcut in Settings.
+
+Choose your notch accent and text animation in **Advanced**. Sweep and Cherenkov Blue are the defaults.
 
 Choose another speech model in Models at any time. Prism downloads it if needed and activates it after any current dictation finishes.
 
