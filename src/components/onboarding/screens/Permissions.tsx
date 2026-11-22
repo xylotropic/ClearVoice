@@ -39,7 +39,7 @@ const PermissionRow: React.FC<PermissionRowProps> = ({
   return (
     <div className="grid grid-cols-[46px_1fr_minmax(112px,auto)] items-center gap-[18px] py-[18px] [&+&]:border-t [&+&]:border-line">
       {/* A label, not a key: neutral, and "Allowed" alone shows the grant. */}
-      <span className="grid size-[46px] place-items-center rounded-[11px] bg-wash text-ink-2">
+      <span className="grid size-[46px] place-items-center text-ink-2">
         {icon}
       </span>
       <div>

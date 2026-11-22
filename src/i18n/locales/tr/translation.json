@@ -15,7 +15,23 @@
     "autoLanguage": "Otomatik",
     "otherLanguages": "Diğer Diller"
   },
+  "home": {
+    "wordsToday": "Bugünkü kelimeler",
+    "wordsTotal": "Toplam kelime",
+    "streak": "Mevcut seri",
+    "timeSaved": "Kazanılan saat",
+    "transcriptions": "Konuşma dökümleri",
+    "activity": "Etkinlik",
+    "dailyWords": "Kelime: {{words}}",
+    "less": "Az",
+    "more": "Çok",
+    "estimated": "Tahmin",
+    "timeEstimate": "Konuşma dakikada 150, yazma dakikada 50 kelime olarak hesaplanır.",
+    "unavailable": "Etkinlik yüklenemedi.",
+    "retry": "Tekrar dene"
+  },
   "sidebar": {
+    "home": "Ana sayfa",
     "general": "Genel",
     "models": "Modeller",
     "advanced": "Gelişmiş",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Hazırsınız",
-      "subMac": "Prism artık menü çubuğunuzda. Konuşmak için herhangi bir uygulamada <keys/> tuşlarını basılı tutun veya dokunun.",
-      "subTray": "Prism artık sistem tepsinizde. Konuşmak için herhangi bir uygulamada <keys/> tuşlarını basılı tutun veya dokunun.",
+      "subMac": "Prism hazır. Kısayolunuzu her uygulamada kullanabilirsiniz.",
+      "subTray": "Prism hazır. Kısayolunuzu her uygulamada kullanabilirsiniz.",
       "hint": "Bunları daha sonra Ayarlar'dan değiştirebilirsiniz",
       "highFiveLabel": "Çak bir beşlik",
       "atLogin": "Oturum açtığımda Prism'yi başlat",
@@ -453,9 +469,16 @@
         "average": "Tüm kanalların ortalaması",
         "channel": "Kanal {{n}}"
       },
+      "cues": {
+        "start": "Başlat",
+        "stop": "Bitir",
+        "cancel": "Esc",
+        "custom": "Özel",
+        "preview": "Sesi dinle: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Sesli Geri Bildirim",
-        "description": "Kayıt başladığında ve bittiğinde ses çalar"
+        "label": "Kayıt sesleri",
+        "description": "Kayıt başlatıldığında, bitirildiğinde veya iptal edildiğinde ses çal."
       },
       "outputDevice": {
         "title": "Çıkış Cihazı",

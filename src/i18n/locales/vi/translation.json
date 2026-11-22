@@ -15,7 +15,23 @@
     "autoLanguage": "Tự động",
     "otherLanguages": "Ngôn ngữ khác"
   },
+  "home": {
+    "wordsToday": "Số từ hôm nay",
+    "wordsTotal": "Tổng số từ",
+    "streak": "Chuỗi hiện tại",
+    "timeSaved": "Số giờ tiết kiệm",
+    "transcriptions": "Bản chép lời",
+    "activity": "Hoạt động",
+    "dailyWords": "Số từ: {{words}}",
+    "less": "Ít",
+    "more": "Nhiều",
+    "estimated": "Ước tính",
+    "timeEstimate": "Dựa trên tốc độ nói 150 từ/phút và gõ 50 từ/phút.",
+    "unavailable": "Không tải được hoạt động.",
+    "retry": "Thử lại"
+  },
   "sidebar": {
+    "home": "Trang chủ",
     "general": "Chung",
     "models": "Mô hình",
     "advanced": "Nâng cao",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Mọi thứ đã sẵn sàng",
-      "subMac": "Prism giờ đã ở trên thanh menu. Giữ hoặc nhấn <keys/> trong bất kỳ ứng dụng nào để nói.",
-      "subTray": "Prism giờ đã ở trong khay hệ thống. Giữ hoặc nhấn <keys/> trong bất kỳ ứng dụng nào để nói.",
+      "subMac": "Prism đã sẵn sàng. Dùng phím tắt trong bất kỳ ứng dụng nào.",
+      "subTray": "Prism đã sẵn sàng. Dùng phím tắt trong bất kỳ ứng dụng nào.",
       "hint": "Bạn có thể thay đổi những mục này sau trong Cài đặt",
       "highFiveLabel": "Đập tay",
       "atLogin": "Khởi động Prism khi tôi đăng nhập",
@@ -453,9 +469,16 @@
         "average": "Trung bình tất cả các kênh",
         "channel": "Kênh {{n}}"
       },
+      "cues": {
+        "start": "Bắt đầu",
+        "stop": "Kết thúc",
+        "cancel": "Esc",
+        "custom": "Tùy chỉnh",
+        "preview": "Nghe thử âm thanh: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Phản hồi âm thanh",
-        "description": "Phát âm thanh khi bắt đầu và kết thúc ghi âm"
+        "label": "Âm thanh ghi âm",
+        "description": "Phát âm thanh khi bắt đầu, kết thúc hoặc hủy ghi âm."
       },
       "outputDevice": {
         "title": "Thiết bị đầu ra",

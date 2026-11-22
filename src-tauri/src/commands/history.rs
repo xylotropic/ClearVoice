@@ -1,5 +1,5 @@
 use crate::managers::{
-    history::{HistoryEntry, HistoryManager, PaginatedHistory},
+    history::{ActivitySummary, HistoryEntry, HistoryManager, PaginatedHistory},
     transcription_jobs::TranscriptionJobManager,
 };
 use std::path::PathBuf;
@@ -18,6 +18,18 @@ pub async fn get_history_entries(
         .get_history_entries(cursor, limit)
         .await
         .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_activity_summary(
+    history_manager: State<'_, Arc<HistoryManager>>,
+) -> Result<ActivitySummary, String> {
+    let history = Arc::clone(&history_manager);
+    tauri::async_runtime::spawn_blocking(move || history.activity_summary())
+        .await
+        .map_err(|error| error.to_string())?
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]

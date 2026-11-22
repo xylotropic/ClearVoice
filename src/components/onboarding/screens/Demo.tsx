@@ -34,6 +34,7 @@ export function Demo({
   const { t } = useTranslation();
   const { getSetting } = useSettings();
   const { preview } = useOnboardingStore();
+  const toggle = getSetting("shortcut_activation") === "toggle";
   const binding = getSetting("bindings")?.transcribe?.current_binding ?? "";
   const capture = useShortcutCapture("transcribe", os, {
     inert: preview,
@@ -74,10 +75,12 @@ export function Demo({
             className="prism-artwork h-40 w-80 object-contain motion-safe:animate-rise"
           />
           <ScreenHeader
-            title={t("onboarding.demo.title")}
+            title={t(toggle ? "onboarding.try.title" : "onboarding.demo.title")}
             sub={
               <Trans
-                i18nKey="onboarding.demo.hold"
+                i18nKey={
+                  toggle ? "onboarding.demo.tap" : "onboarding.demo.hold"
+                }
                 components={[
                   <span key="cursor" />,
                   <span key="hold" />,

@@ -145,6 +145,7 @@ fn import_legacy_data(legacy: &Path, target: &Path) -> anyhow::Result<()> {
         "models",
         "custom_start.wav",
         "custom_stop.wav",
+        "custom_cancel.wav",
     ] {
         let source = legacy.join(name);
         if source.exists() {

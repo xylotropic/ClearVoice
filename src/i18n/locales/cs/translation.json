@@ -15,7 +15,23 @@
     "autoLanguage": "Automaticky",
     "otherLanguages": "Další jazyky"
   },
+  "home": {
+    "wordsToday": "Slova dnes",
+    "wordsTotal": "Slova celkem",
+    "streak": "Aktuální série",
+    "timeSaved": "Ušetřené hodiny",
+    "transcriptions": "Přepisy",
+    "activity": "Aktivita",
+    "dailyWords": "Slova: {{words}}",
+    "less": "Méně",
+    "more": "Více",
+    "estimated": "Odhad",
+    "timeEstimate": "Při 150 slovech za minutu mluvení a 50 při psaní.",
+    "unavailable": "Aktivitu se nepodařilo načíst.",
+    "retry": "Zkusit znovu"
+  },
   "sidebar": {
+    "home": "Domů",
     "general": "Obecné",
     "models": "Modely",
     "advanced": "Pokročilé",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Hotovo",
-      "subMac": "Prism je teď na řádku nabídek. Podržte nebo klepněte na <keys/> v jakékoli aplikaci a mluvte.",
-      "subTray": "Prism je teď v oznamovací oblasti. Podržte nebo klepněte na <keys/> v jakékoli aplikaci a mluvte.",
+      "subMac": "Prism je připraven. Použijte zkratku v libovolné aplikaci.",
+      "subTray": "Prism je připraven. Použijte zkratku v libovolné aplikaci.",
       "hint": "Tohle můžete později změnit v Nastavení",
       "highFiveLabel": "Plácnout si",
       "atLogin": "Spustit Prism po přihlášení",
@@ -453,9 +469,16 @@
         "average": "Průměr všech kanálů",
         "channel": "Kanál {{n}}"
       },
+      "cues": {
+        "start": "Začátek",
+        "stop": "Konec",
+        "cancel": "Esc",
+        "custom": "Vlastní",
+        "preview": "Přehrát zvuk: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Zvuková odezva",
-        "description": "Přehrát zvuk při zahájení a ukončení nahrávání"
+        "label": "Zvuky nahrávání",
+        "description": "Zvuk při zahájení, ukončení nebo zrušení nahrávání."
       },
       "outputDevice": {
         "title": "Výstupní zařízení",

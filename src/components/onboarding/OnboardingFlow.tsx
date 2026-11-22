@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { commands, type ChineseScript } from "@/bindings";
 import { useSettings } from "@/hooks/useSettings";
@@ -93,16 +93,6 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     selectModel,
   ]);
 
-  // Teach the same hold-to-talk shortcut that Prism uses after setup.
-  const activationSet = useRef(false);
-  const activation = settings?.shortcut_activation;
-  useEffect(() => {
-    if (preview || !activation || activationSet.current) return;
-    activationSet.current = true;
-    if (activation !== "push_to_talk")
-      updateSetting("shortcut_activation", "push_to_talk");
-  }, [preview, activation]);
-
   // Before first paint so a preview never shows the saved step.
   useLayoutEffect(() => {
     store.reset(preview);
@@ -150,6 +140,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   const finish = async () => {
     // Saved only now: each login item change posts a macOS notification.
     if (!preview) {
+      await updateSetting("start_hidden", store.atLogin && store.startHidden);
       await updateSetting("autostart_enabled", store.atLogin);
       await commands.completeOnboarding();
     }

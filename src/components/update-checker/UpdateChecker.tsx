@@ -15,9 +15,13 @@ import {
 
 interface UpdateCheckerProps {
   className?: string;
+  onlyWhenActive?: boolean;
 }
 
-const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
+const UpdateChecker: React.FC<UpdateCheckerProps> = ({
+  className = "",
+  onlyWhenActive,
+}) => {
   const { t } = useTranslation();
   // Update checking state
   const [isChecking, setIsChecking] = useState(false);
@@ -205,6 +209,17 @@ const UpdateChecker: React.FC<UpdateCheckerProps> = ({ className = "" }) => {
   // When no installer could be resolved for this target the button falls back to
   // the releases index, so the dialog has to say "browse" rather than "download".
   const hasDirectInstaller = portableInstallerUrl !== PORTABLE_RELEASES_URL;
+
+  if (
+    onlyWhenActive &&
+    !isChecking &&
+    !isInstalling &&
+    !updateAvailable &&
+    !showUpToDate &&
+    !showPortableUpdateDialog
+  ) {
+    return null;
+  }
 
   return (
     <>

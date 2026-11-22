@@ -15,7 +15,23 @@
     "autoLanguage": "Automatique",
     "otherLanguages": "Autres langues"
   },
+  "home": {
+    "wordsToday": "Mots aujourd’hui",
+    "wordsTotal": "Total des mots",
+    "streak": "Série en cours",
+    "timeSaved": "Heures gagnées",
+    "transcriptions": "Transcriptions",
+    "activity": "Activité",
+    "dailyWords": "Mots : {{words}}",
+    "less": "Moins",
+    "more": "Plus",
+    "estimated": "Estimation",
+    "timeEstimate": "À raison de 150 mots/min à l’oral et 50 au clavier.",
+    "unavailable": "Impossible de charger l’activité.",
+    "retry": "Réessayer"
+  },
   "sidebar": {
+    "home": "Accueil",
     "general": "Général",
     "models": "Modèles",
     "advanced": "Avancé",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Tout est prêt",
-      "subMac": "Prism est maintenant dans votre barre des menus. Maintenez ou appuyez sur <keys/> dans n'importe quelle app pour parler.",
-      "subTray": "Prism est maintenant dans votre zone de notification. Maintenez ou appuyez sur <keys/> dans n'importe quelle app pour parler.",
+      "subMac": "Prism est prêt. Utilisez votre raccourci dans n’importe quelle application.",
+      "subTray": "Prism est prêt. Utilisez votre raccourci dans n’importe quelle application.",
       "hint": "Vous pourrez modifier tout cela plus tard dans les Paramètres",
       "highFiveLabel": "Tope là",
       "atLogin": "Lancer Prism à l'ouverture de ma session",
@@ -453,9 +469,16 @@
         "average": "Moyenne de tous les canaux",
         "channel": "Canal {{n}}"
       },
+      "cues": {
+        "start": "Début",
+        "stop": "Fin",
+        "cancel": "Échap",
+        "custom": "Personnalisé",
+        "preview": "Écouter le son : {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Signal sonore",
-        "description": "Jouer un son au début et à la fin de l'enregistrement"
+        "label": "Sons d’enregistrement",
+        "description": "Joue un son au début, à la fin ou à l’annulation d’un enregistrement."
       },
       "outputDevice": {
         "title": "Périphérique de sortie",

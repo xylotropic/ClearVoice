@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
 import { LiveTranscript } from "./LiveTranscript";
 import prismMark from "@/assets/prism-mark.webp";
+import prismNotch from "@/assets/prism-notch.webp";
 import { commands, events } from "@/bindings";
 import type {
   Notice,
@@ -31,8 +32,8 @@ const isNoticeState = (state: OverlayState) =>
 
 // Number of reactive bars in the waveform (the simple, smoothed style shared by
 // every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
-const WAVE_BARS = 9;
 const IS_MAC = navigator.userAgent.includes("Macintosh");
+const WAVE_BARS = IS_MAC ? 13 : 9;
 
 // Only call out a model load in the Live preview once it has run this long.
 // Warm loads finish in well under this (~0.2s on Apple Silicon, ~1.5s on a
@@ -85,6 +86,7 @@ const RecordingOverlay: React.FC = () => {
   // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [pasteConfirmed, setPasteConfirmed] = useState(false);
   const [noticeWidth, setNoticeWidth] = useState<number>();
   const noticeProbeRef = useRef<HTMLSpanElement>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -107,6 +109,7 @@ const RecordingOverlay: React.FC = () => {
       const unlistenShow = await listen("show-overlay", async (event) => {
         const overlayState = event.payload as OverlayState;
         clearTimeout(fadeTimerRef.current);
+        setPasteConfirmed(false);
         if (!isNoticeState(overlayState)) setNotice(null);
         // Reset synchronously before settings I/O. A fast microphone can emit
         // recording-ready while the awaits below are in flight; resetting after
@@ -155,6 +158,10 @@ const RecordingOverlay: React.FC = () => {
         }, OVERLAY_FADE_MS);
       });
 
+      const unlistenPaste = await listen("paste-confirmed", () =>
+        setPasteConfirmed(true),
+      );
+
       const unlistenReady = await listen("recording-ready", () => {
         setElapsed(0);
         setCaptureReady(true);
@@ -166,7 +173,9 @@ const RecordingOverlay: React.FC = () => {
         // bars for the shared waveform.
         const smoothed = smoothedLevelsRef.current.map((prev, i) => {
           const target = newLevels[i] || 0;
-          return prev * 0.7 + target * 0.3;
+          // Respond quickly to the start of a syllable and release smoothly.
+          const response = target > prev ? 0.58 : 0.27;
+          return prev + (target - prev) * response;
         });
         smoothedLevelsRef.current = smoothed;
         setLevels(smoothed.slice(0, WAVE_BARS));
@@ -213,6 +222,7 @@ const RecordingOverlay: React.FC = () => {
         unlistenNotice();
         unlistenShow();
         unlistenHide();
+        unlistenPaste();
         unlistenReady();
         unlistenLevel();
         unlistenStream();
@@ -274,7 +284,7 @@ const RecordingOverlay: React.FC = () => {
 
   if (!isVisible && !shownNotice) return null;
 
-  const stageClass = `ov-stage ${position}${IS_MAC && position === "top" ? " docked" : ""}`;
+  const stageClass = `ov-stage ${position}${IS_MAC ? " mac-notch" : ""}${IS_MAC && position === "top" ? " docked" : ""}${pasteConfirmed ? " paste-confirmed" : ""}`;
 
   // Re-pin when the user is within ~a line of the bottom; unpin otherwise.
   const handleStreamScroll = () => {
@@ -292,15 +302,20 @@ const RecordingOverlay: React.FC = () => {
 
   // ---- Shared building blocks (one visual language for every overlay form) ----
   const waveform = (
-    <div className={`swave ${captureReady ? "ready" : "arming"}`}>
-      {levels.map((v, i) => (
-        <i
-          key={i}
-          style={{
-            height: `${Math.max(3, Math.min(18, 3 + Math.pow(v, 0.7) * 15))}px`,
-          }}
-        />
-      ))}
+    <div
+      className={`swave ${captureReady ? "ready" : "arming"}`}
+      aria-hidden="true"
+    >
+      {levels.map((level, index) => {
+        const center = (WAVE_BARS - 1) / 2;
+        const taper = 1 - (0.45 * Math.abs(index - center)) / center;
+        const height =
+          3 +
+          Math.pow(Math.max(0, Math.min(1, level)), 0.42) *
+            taper *
+            (IS_MAC ? 33 : 17);
+        return <i key={index} style={{ height }} />;
+      })}
     </div>
   );
 
@@ -324,15 +339,23 @@ const RecordingOverlay: React.FC = () => {
   // dot (left) | waveform (center) | timer + cancel (right) — same structure for
   // pill & panel, so the Live morph is a pure width change.
   const listeningRow = (showTimer: boolean, showCancel: boolean) => (
-    <div className="sbase listening">
+    <div
+      className="sbase listening"
+      data-speaking={
+        (captureReady && levels.some((value) => value > 0.045)) || undefined
+      }
+    >
       <div className="sbase-l">
-        <img
-          className={`smark ${captureReady ? "ready" : "arming"}`}
-          src={prismMark}
-          width={19}
-          height={19}
-          alt=""
-        />
+        <picture>
+          <source media="(prefers-reduced-motion: reduce)" srcSet={prismMark} />
+          <img
+            className={`smark ${captureReady ? "ready" : "arming"}`}
+            src={IS_MAC && captureReady ? prismNotch : prismMark}
+            width={IS_MAC ? 29 : 22}
+            height={IS_MAC ? 29 : 22}
+            alt=""
+          />
+        </picture>
       </div>
       {waveform}
       <div className="sbase-r">

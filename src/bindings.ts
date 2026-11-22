@@ -891,6 +891,9 @@ async getSelectedOutputDevice() : Promise<Result<string, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async changeRecordingSounds(sounds: RecordingSounds) : Promise<void> {
+    await TAURI_INVOKE("change_recording_sounds", { sounds });
+},
 async playTestSound(soundType: string) : Promise<void> {
     await TAURI_INVOKE("play_test_sound", { soundType });
 },
@@ -964,6 +967,14 @@ async unloadModelManually() : Promise<Result<null, string>> {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async getActivitySummary() : Promise<Result<ActivitySummary, string>> {
+    try {
+        return { status: "ok", data: await TAURI_INVOKE("get_activity_summary") };
+    } catch (e) {
+        if(e instanceof Error) throw e;
+        else return { status: "error", error: e as any };
+    }
 },
 async getHistoryEntries(cursor: number | null, limit: number | null) : Promise<Result<PaginatedHistory, string>> {
     try {
@@ -1106,6 +1117,8 @@ transcriptionJob: "transcription-job"
  * object, so a partial store can never fail the whole load (#1619).
  * Field-level defaults below take precedence where present.
  */
+export type ActivityDay = { date: string; words: number }
+export type ActivitySummary = { today: string; words_today: number; words_total: number; transcriptions: number; streak: number; days: ActivityDay[] }
 export type AppSettings = { 
 /**
  * Internal settings schema marker for one-time migrations. Fresh installs
@@ -1127,7 +1140,7 @@ shortcut_activation?: ShortcutActivation;
  * Hold-or-toggle only: a press held at least this long is push-to-talk,
  * anything shorter is a tap that locks recording on.
  */
-hold_threshold_ms?: number; audio_feedback?: boolean; audio_feedback_volume?: number; sound_theme?: SoundTheme; start_hidden?: boolean; autostart_enabled?: boolean; update_checks_enabled?: boolean; show_whats_new_on_update?: boolean; 
+hold_threshold_ms?: number; audio_feedback?: boolean; audio_feedback_volume?: number; sound_theme?: SoundTheme; recording_sounds?: RecordingSounds; start_hidden?: boolean; autostart_enabled?: boolean; update_checks_enabled?: boolean; show_whats_new_on_update?: boolean;
 /**
  * The app version whose What's New the user has already seen. Fresh installs
  * default to the current version (nothing is "new" to them). Existing users
@@ -1488,6 +1501,7 @@ export type ShortcutActivation =
  */
 "hold_or_toggle"
 export type ShortcutBinding = { id: string; name: string; description: string; default_binding: string; current_binding: string }
+export type RecordingSounds = { start?: SoundTheme | null; stop?: SoundTheme | null; cancel?: SoundTheme | null }
 export type SoundTheme = "marimba" | "pop" | "custom"
 /**
  * Phase of the streaming overlay card, emitted to drive its UI state.

@@ -1,10 +1,13 @@
+#[cfg(not(target_os = "macos"))]
 use crate::input;
 use crate::notices::Notice;
 use crate::settings;
 use crate::settings::{OverlayPosition, OverlayStyle};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize};
+use tauri::{AppHandle, Emitter, Manager};
+#[cfg(any(not(target_os = "macos"), test))]
+use tauri::{PhysicalPosition, PhysicalSize};
 
 #[cfg(not(target_os = "macos"))]
 use log::debug;
@@ -16,7 +19,9 @@ use tauri::WebviewWindowBuilder;
 use tauri::WebviewUrl;
 
 #[cfg(target_os = "macos")]
-use tauri_nspanel::{tauri_panel, CollectionBehavior, PanelBuilder, PanelLevel, StyleMask};
+use tauri_nspanel::{
+    tauri_panel, CollectionBehavior, ManagerExt, PanelBuilder, PanelLevel, StyleMask,
+};
 
 #[cfg(target_os = "linux")]
 use crate::utils;
@@ -198,6 +203,7 @@ fn force_overlay_topmost(overlay_window: &tauri::webview::WebviewWindow) {
     });
 }
 
+#[cfg(not(target_os = "macos"))]
 fn get_monitor_with_cursor(app_handle: &AppHandle) -> Option<tauri::Monitor> {
     if let Some(mouse_location) = input::get_cursor_position(app_handle) {
         if let Ok(monitors) = app_handle.available_monitors() {
@@ -232,6 +238,7 @@ fn get_monitor_with_cursor(app_handle: &AppHandle) -> Option<tauri::Monitor> {
     app_handle.primary_monitor().ok().flatten()
 }
 
+#[cfg(any(not(target_os = "macos"), test))]
 fn is_mouse_within_monitor(
     mouse_pos: (i32, i32),
     monitor_pos: &PhysicalPosition<i32>,
@@ -253,19 +260,8 @@ fn is_mouse_within_monitor(
         && mouse_y < (monitor_y + monitor_height as i32)
 }
 
-/// Returns overlay position in logical coordinates (points on macOS).
-///
-/// The macOS anchors use the work area (visibleFrame) so the overlay
-/// tracks the Dock — above it when shown, at the screen edge when hidden.
-/// This relies on tauri 2.11's work_area.position.y fix (#14655), the same
-/// bug that led PR #969 to abandon work_area for full monitor bounds. The
-/// other platforms keep full monitor bounds plus the fixed offsets
-/// (work_area is unreliable on Wayland; Windows' offset clears the taskbar).
-///
-/// We must use LogicalPosition (not PhysicalPosition) because Tauri/tao
-/// converts PhysicalPosition using the scale factor of the monitor the window
-/// is *currently* on, which is wrong when moving cross-monitor. Windows uses
-/// `place_windows_overlay` instead (no single logical space across mixed DPI).
+/// Returns overlay position in logical pixels for non-Wayland Linux.
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
 fn calculate_overlay_position(
     app_handle: &AppHandle,
     width: f64,
@@ -276,39 +272,61 @@ fn calculate_overlay_position(
     let monitor_x = monitor.position().x as f64 / scale;
     let monitor_y = monitor.position().y as f64 / scale;
     let monitor_width = monitor.size().width as f64 / scale;
-
-    let settings = settings::get_settings(app_handle);
-
     let x = monitor_x + (monitor_width - width) / 2.0;
-    let y = match settings.overlay_position {
-        OverlayPosition::Top => {
-            #[cfg(target_os = "macos")]
-            {
-                // The software panel attaches to the display edge. Its
-                // controls sit on the flanks, clear of the built-in camera.
-                monitor_y
-            }
-            #[cfg(not(target_os = "macos"))]
-            {
-                monitor_y + OVERLAY_TOP_OFFSET
-            }
-        }
+    let y = match settings::get_settings(app_handle).overlay_position {
+        OverlayPosition::Top => monitor_y + OVERLAY_TOP_OFFSET,
         OverlayPosition::Bottom => {
-            // work_area.position shares monitor.position's global coordinate
-            // space, so no monitor offset is added.
-            #[cfg(target_os = "macos")]
-            let bottom = {
-                let wa = monitor.work_area();
-                (wa.position.y as f64 + wa.size.height as f64) / scale
-            };
-            #[cfg(not(target_os = "macos"))]
-            let bottom = monitor_y + monitor.size().height as f64 / scale;
-
-            bottom - height - OVERLAY_BOTTOM_OFFSET
+            monitor_y + monitor.size().height as f64 / scale - height - OVERLAY_BOTTOM_OFFSET
         }
     };
-
     Some((x, y))
+}
+
+/// Center the panel on one NSScreen and position it entirely in that screen's
+/// safe area. AppKit uses the same coordinates for screens and window frames,
+/// including displays with different scaling factors and negative origins.
+#[cfg(target_os = "macos")]
+fn place_macos_overlay(app: &AppHandle, width: f64, height: f64, position: OverlayPosition) {
+    use objc2::{sel, MainThreadMarker};
+    use objc2_app_kit::{NSEvent, NSScreen};
+    use objc2_foundation::{NSObjectProtocol, NSPoint};
+
+    let Some(main_thread) = MainThreadMarker::new() else {
+        return;
+    };
+    let Ok(panel) = app.get_webview_panel("recording_overlay") else {
+        return;
+    };
+    let screens = NSScreen::screens(main_thread);
+    let cursor = NSEvent::mouseLocation();
+    let Some(screen) = screens
+        .iter()
+        .find(|screen| {
+            let frame = screen.frame();
+            cursor.x >= frame.origin.x
+                && cursor.x < frame.origin.x + frame.size.width
+                && cursor.y >= frame.origin.y
+                && cursor.y < frame.origin.y + frame.size.height
+        })
+        .or_else(|| screens.firstObject())
+    else {
+        return;
+    };
+
+    let frame = screen.frame();
+    let work = screen.visibleFrame();
+    let top = frame.origin.y + frame.size.height;
+    let camera = if screen.respondsToSelector(sel!(safeAreaInsets)) {
+        screen.safeAreaInsets().top
+    } else {
+        0.0
+    };
+    let x = frame.origin.x + (frame.size.width - width) / 2.0;
+    let y = match position {
+        OverlayPosition::Top => (top - camera).min(work.origin.y + work.size.height),
+        OverlayPosition::Bottom => work.origin.y + height + OVERLAY_BOTTOM_OFFSET,
+    };
+    panel.as_panel().setFrameTopLeftPoint(NSPoint::new(x, y));
 }
 
 /// Current overlay window size in logical units (points), for repositioning
@@ -500,37 +518,37 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
 /// Creates the recording overlay panel and keeps it hidden by default (macOS)
 #[cfg(target_os = "macos")]
 pub fn create_recording_overlay(app_handle: &AppHandle) {
-    if let Some((x, y)) = calculate_overlay_position(app_handle, OVERLAY_WIDTH, OVERLAY_HEIGHT) {
-        // PanelBuilder creates a Tauri window then converts it to NSPanel.
-        // The window remains registered, so get_webview_window() still works.
-        match PanelBuilder::<_, RecordingOverlayPanel>::new(app_handle, "recording_overlay")
-            .url(WebviewUrl::App("src/overlay/index.html".into()))
-            .title("Recording")
-            .position(tauri::Position::Logical(tauri::LogicalPosition { x, y }))
-            .level(PanelLevel::Status)
-            .size(tauri::Size::Logical(tauri::LogicalSize {
-                width: OVERLAY_WIDTH,
-                height: OVERLAY_HEIGHT,
-            }))
-            .has_shadow(false)
-            .transparent(true)
-            .no_activate(true)
-            .corner_radius(0.0)
-            .style_mask(StyleMask::empty().borderless().nonactivating_panel())
-            .with_window(|w| w.decorations(false).transparent(true).focusable(false))
-            .collection_behavior(
-                CollectionBehavior::new()
-                    .can_join_all_spaces()
-                    .full_screen_auxiliary(),
-            )
-            .build()
-        {
-            Ok(panel) => {
-                panel.hide();
-            }
-            Err(e) => {
-                log::error!("Failed to create recording overlay panel: {}", e);
-            }
+    // PanelBuilder creates a Tauri window then converts it to NSPanel.
+    // The window remains registered, so get_webview_window() still works.
+    match PanelBuilder::<_, RecordingOverlayPanel>::new(app_handle, "recording_overlay")
+        .url(WebviewUrl::App("src/overlay/index.html".into()))
+        .title("Recording")
+        .level(PanelLevel::PopUpMenu)
+        .size(tauri::Size::Logical(tauri::LogicalSize {
+            width: OVERLAY_WIDTH,
+            height: OVERLAY_HEIGHT,
+        }))
+        .has_shadow(false)
+        .transparent(true)
+        .no_activate(true)
+        .hides_on_deactivate(false)
+        .corner_radius(0.0)
+        .style_mask(StyleMask::empty().borderless().nonactivating_panel())
+        .with_window(|w| w.decorations(false).transparent(true).focusable(false))
+        .collection_behavior(
+            CollectionBehavior::new()
+                .can_join_all_spaces()
+                .full_screen_auxiliary()
+                .full_screen_disallows_tiling()
+                .ignores_cycle(),
+        )
+        .build()
+    {
+        Ok(panel) => {
+            panel.hide();
+        }
+        Err(e) => {
+            log::error!("Failed to create recording overlay panel: {}", e);
         }
     }
 }
@@ -594,7 +612,7 @@ fn show_overlay_state_on_main(app_handle: &AppHandle, state: &str) {
             let size_elapsed = size_started.elapsed();
 
             let pos_started = std::time::Instant::now();
-            #[cfg(not(target_os = "windows"))]
+            #[cfg(not(any(target_os = "macos", target_os = "windows")))]
             let set_pos_elapsed =
                 if let Some((x, y)) = calculate_overlay_position(app_handle, width, height) {
                     let set_pos_started = std::time::Instant::now();
@@ -604,6 +622,16 @@ fn show_overlay_state_on_main(app_handle: &AppHandle, state: &str) {
                 } else {
                     std::time::Duration::ZERO
                 };
+            #[cfg(target_os = "macos")]
+            let set_pos_elapsed = {
+                place_macos_overlay(
+                    app_handle,
+                    width,
+                    height,
+                    settings::get_settings(app_handle).overlay_position,
+                );
+                pos_started.elapsed()
+            };
             #[cfg(target_os = "windows")]
             let set_pos_elapsed = {
                 let set_pos_started = std::time::Instant::now();
@@ -617,6 +645,12 @@ fn show_overlay_state_on_main(app_handle: &AppHandle, state: &str) {
             let pos_calc_elapsed = pos_started.elapsed() - set_pos_elapsed;
 
             let show_started = std::time::Instant::now();
+            #[cfg(target_os = "macos")]
+            match app_handle.get_webview_panel("recording_overlay") {
+                Ok(panel) => panel.order_front_regardless(),
+                Err(err) => log::warn!("Unable to show dictation panel: {err:?}"),
+            }
+            #[cfg(not(target_os = "macos"))]
             let _ = overlay_window.show();
             let show_elapsed = show_started.elapsed();
 
@@ -723,6 +757,33 @@ pub fn is_session_showing() -> bool {
     OVERLAY_SESSION_SHOWING.load(Ordering::SeqCst)
 }
 
+/// Confirm a successful paste in the existing panel after delivery.
+pub fn show_paste_confirmation(app: &AppHandle) {
+    if !OVERLAY_ENABLED.load(Ordering::Relaxed) || !is_session_showing() {
+        hide_recording_overlay(app);
+        return;
+    }
+
+    let handle = app.clone();
+    let generation = OVERLAY_SHOW_GENERATION.load(Ordering::SeqCst);
+    let event_app = handle.clone();
+    let _ = handle.run_on_main_thread(move || {
+        if OVERLAY_SHOW_GENERATION.load(Ordering::SeqCst) == generation && is_session_showing() {
+            let _ = event_app.emit_to("recording_overlay", "paste-confirmed", ());
+        }
+    });
+    tauri::async_runtime::spawn(async move {
+        tokio::time::sleep(Duration::from_millis(420)).await;
+        let app = handle.clone();
+        let _ = handle.run_on_main_thread(move || {
+            if OVERLAY_SHOW_GENERATION.load(Ordering::SeqCst) == generation && is_session_showing()
+            {
+                hide_recording_overlay(&app);
+            }
+        });
+    });
+}
+
 /// Updates the overlay window position based on current settings
 pub fn update_overlay_position(app_handle: &AppHandle) {
     // Positioning queries monitors/cursor (GDK/Xlib on Linux) and moves the
@@ -762,6 +823,14 @@ fn update_overlay_position_on_main(app_handle: &AppHandle) {
             // overlay is in compact or streaming layout.
             let (width, height) = current_overlay_logical_size(&overlay_window)
                 .unwrap_or((OVERLAY_WIDTH, OVERLAY_HEIGHT));
+            #[cfg(target_os = "macos")]
+            place_macos_overlay(
+                app_handle,
+                width,
+                height,
+                settings::get_settings(app_handle).overlay_position,
+            );
+            #[cfg(not(target_os = "macos"))]
             if let Some((x, y)) = calculate_overlay_position(app_handle, width, height) {
                 let _ = overlay_window
                     .set_position(tauri::Position::Logical(tauri::LogicalPosition { x, y }));

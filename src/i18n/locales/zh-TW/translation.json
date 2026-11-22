@@ -15,7 +15,23 @@
     "autoLanguage": "自動",
     "otherLanguages": "其他語言"
   },
+  "home": {
+    "wordsToday": "今日字詞數",
+    "wordsTotal": "總字詞數",
+    "streak": "連續使用天數",
+    "timeSaved": "節省時間",
+    "transcriptions": "轉錄次數",
+    "activity": "活動",
+    "dailyWords": "字詞數：{{words}}",
+    "less": "少",
+    "more": "多",
+    "estimated": "估算",
+    "timeEstimate": "以每分鐘口述 150 詞、打字 50 詞估算。",
+    "unavailable": "無法載入活動。",
+    "retry": "再試一次"
+  },
   "sidebar": {
+    "home": "主頁",
     "general": "一般",
     "models": "模型",
     "advanced": "進階",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "全部設定完成",
-      "subMac": "Prism 現在位於選單列中。在任何應用程式中按住或輕按 <keys/> 即可開口說話。",
-      "subTray": "Prism 現在位於系統匣中。在任何應用程式中按住或輕按 <keys/> 即可開口說話。",
+      "subMac": "Prism 已就緒。可在任何應用程式使用快速鍵。",
+      "subTray": "Prism 已就緒。可在任何應用程式使用快速鍵。",
       "hint": "之後可以隨時在「設定」中變更",
       "highFiveLabel": "擊掌",
       "atLogin": "登入時啟動 Prism",
@@ -453,9 +469,16 @@
         "average": "所有聲道的平均值",
         "channel": "聲道 {{n}}"
       },
+      "cues": {
+        "start": "開始",
+        "stop": "結束",
+        "cancel": "Esc",
+        "custom": "自訂",
+        "preview": "試聽音效：{{cue}}"
+      },
       "audioFeedback": {
-        "label": "聲音回饋",
-        "description": "錄製開始和停止時播放聲音"
+        "label": "錄音音效",
+        "description": "開始、結束或取消錄音時播放音效。"
       },
       "outputDevice": {
         "title": "輸出裝置",

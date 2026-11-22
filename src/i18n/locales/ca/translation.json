@@ -15,7 +15,23 @@
     "autoLanguage": "Automàtica",
     "otherLanguages": "Altres llengües"
   },
+  "home": {
+    "wordsToday": "Paraules d’avui",
+    "wordsTotal": "Total de paraules",
+    "streak": "Ratxa actual",
+    "timeSaved": "Hores estalviades",
+    "transcriptions": "Transcripcions",
+    "activity": "Activitat",
+    "dailyWords": "Paraules: {{words}}",
+    "less": "Menys",
+    "more": "Més",
+    "estimated": "Estimació",
+    "timeEstimate": "A 150 paraules/min parlant i 50 escrivint.",
+    "unavailable": "No s’ha pogut carregar l’activitat.",
+    "retry": "Torna-ho a provar"
+  },
   "sidebar": {
+    "home": "Inici",
     "general": "General",
     "models": "Models",
     "advanced": "Avançat",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Tot a punt",
-      "subMac": "El Prism ja és a la barra de menús. Manteniu premut o premeu <keys/> a qualsevol aplicació per parlar.",
-      "subTray": "El Prism ja és a la safata del sistema. Manteniu premut o premeu <keys/> a qualsevol aplicació per parlar.",
+      "subMac": "Prism ja està a punt. Fes servir la drecera en qualsevol aplicació.",
+      "subTray": "Prism ja està a punt. Fes servir la drecera en qualsevol aplicació.",
       "hint": "Podeu canviar-ho més tard a la configuració",
       "highFiveLabel": "Xoqueu-la",
       "atLogin": "Inicia el Prism quan entri a la sessió",
@@ -453,9 +469,16 @@
         "average": "Fes la mitjana de tots els canals",
         "channel": "Canal {{n}}"
       },
+      "cues": {
+        "start": "Inici",
+        "stop": "Final",
+        "cancel": "Esc",
+        "custom": "Personalitzat",
+        "preview": "Escolta el so: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Avisos sonors",
-        "description": "Reprodueix un so quan s'inicia i s'atura l'enregistrament"
+        "label": "Sons d’enregistrament",
+        "description": "Sons en iniciar, acabar o cancel·lar l’enregistrament."
       },
       "outputDevice": {
         "title": "Dispositiu de sortida",

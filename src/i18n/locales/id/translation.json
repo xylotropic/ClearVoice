@@ -15,7 +15,23 @@
     "autoLanguage": "Otomatis",
     "otherLanguages": "Bahasa Lain"
   },
+  "home": {
+    "wordsToday": "Kata hari ini",
+    "wordsTotal": "Jumlah kata",
+    "streak": "Rangkaian hari",
+    "timeSaved": "Jam dihemat",
+    "transcriptions": "Transkripsi",
+    "activity": "Aktivitas",
+    "dailyWords": "Kata: {{words}}",
+    "less": "Lebih sedikit",
+    "more": "Lebih banyak",
+    "estimated": "Perkiraan",
+    "timeEstimate": "Dengan 150 kata/menit saat berbicara dan 50 saat mengetik.",
+    "unavailable": "Aktivitas tidak dapat dimuat.",
+    "retry": "Coba lagi"
+  },
   "sidebar": {
+    "home": "Beranda",
     "general": "Umum",
     "models": "Model",
     "advanced": "Lanjutan",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Semua siap",
-      "subMac": "Prism kini ada di bilah menu Anda. Tahan atau ketuk <keys/> di aplikasi apa pun untuk bicara.",
-      "subTray": "Prism kini ada di baki sistem Anda. Tahan atau ketuk <keys/> di aplikasi apa pun untuk bicara.",
+      "subMac": "Prism siap. Gunakan pintasanmu di aplikasi apa pun.",
+      "subTray": "Prism siap. Gunakan pintasanmu di aplikasi apa pun.",
       "hint": "Anda dapat mengubahnya nanti di Pengaturan",
       "highFiveLabel": "Tos",
       "atLogin": "Jalankan Prism saat saya masuk",
@@ -453,9 +469,16 @@
         "average": "Rata-ratakan semua kanal",
         "channel": "Kanal {{n}}"
       },
+      "cues": {
+        "start": "Mulai",
+        "stop": "Selesai",
+        "cancel": "Esc",
+        "custom": "Kustom",
+        "preview": "Putar suara: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Umpan Balik Audio",
-        "description": "Putar suara saat perekaman dimulai dan dihentikan"
+        "label": "Suara perekaman",
+        "description": "Putar suara saat mulai, selesai, atau membatalkan perekaman."
       },
       "outputDevice": {
         "title": "Perangkat Keluaran",

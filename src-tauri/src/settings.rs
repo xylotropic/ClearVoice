@@ -292,6 +292,15 @@ pub enum SoundTheme {
     Custom,
 }
 
+/// Optional overrides for the cues. Older installations use their saved theme.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Default, Type)]
+#[serde(default)]
+pub struct RecordingSounds {
+    pub start: Option<SoundTheme>,
+    pub stop: Option<SoundTheme>,
+    pub cancel: Option<SoundTheme>,
+}
+
 impl SoundTheme {
     fn as_str(&self) -> &'static str {
         match self {
@@ -421,6 +430,8 @@ pub struct AppSettings {
     pub audio_feedback_volume: f32,
     #[serde(default = "default_sound_theme")]
     pub sound_theme: SoundTheme,
+    #[serde(default)]
+    pub recording_sounds: RecordingSounds,
     #[serde(default = "default_start_hidden")]
     pub start_hidden: bool,
     #[serde(default = "default_autostart_enabled")]
@@ -1017,6 +1028,7 @@ pub fn get_default_settings() -> AppSettings {
         audio_feedback: false,
         audio_feedback_volume: default_audio_feedback_volume(),
         sound_theme: default_sound_theme(),
+        recording_sounds: RecordingSounds::default(),
         start_hidden: default_start_hidden(),
         autostart_enabled: default_autostart_enabled(),
         update_checks_enabled: default_update_checks_enabled(),

@@ -75,7 +75,21 @@ test("the virtual notch stays attached as the live transcript opens", async ({
     const resting = await card.boundingBox();
     expect(resting?.y).toBe(0);
     const meter = await page.locator(".swave").boundingBox();
-    expect(meter?.x).toBeGreaterThan(250);
+    expect(meter?.x).toBeGreaterThan(200);
+    await expect(card).toHaveCSS("background-color", "rgb(0, 0, 0)");
+    await page.mouse.move(2, 115);
+    await expect(page.locator(".sx")).toHaveCSS("opacity", "0");
+    await card.hover();
+    await expect(page.locator(".sx")).toHaveCSS("opacity", "1");
+    await emit("recording-ready");
+    await emit("mic-level", Array(16).fill(0.65));
+    await expect(page.locator(".sbase.listening")).toHaveAttribute(
+      "data-speaking",
+      "true",
+    );
+    expect(
+      (await page.locator(".swave i").nth(6).boundingBox())?.height,
+    ).toBeGreaterThan(20);
     await emit("stream-text-event", {
       committed: "Open the right file",
       tentative: "",
@@ -87,6 +101,8 @@ test("the virtual notch stays attached as the live transcript opens", async ({
     await expect(page.locator(".stext-cap p")).toHaveText(
       "Open the right file",
     );
+    await emit("paste-confirmed");
+    await expect(card).toHaveCSS("border-bottom-color", "rgb(71, 166, 255)");
   } finally {
     await page.close();
   }

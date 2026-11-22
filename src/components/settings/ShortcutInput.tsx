@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { formatKeyCombination } from "../../lib/utils/keyboard";
+import { keycapLabel, spaceDoesNotClick } from "../../lib/utils/keyboard";
+import { CapturedKeys, Keycaps } from "../shared/Keycaps";
 import { ResetButton } from "../ui/ResetButton";
 import { SettingContainer } from "../ui/SettingContainer";
 import { useSettings } from "../../hooks/useSettings";
@@ -109,21 +110,30 @@ export const ShortcutInput: React.FC<ShortcutInputProps> = ({
         {capturing ? (
           <div
             ref={shortcutRef}
-            className="px-2 py-1 text-sm font-semibold border border-logo-primary bg-logo-primary/20 rounded-md"
+            className="flex min-h-9 items-center px-2.5 pb-1"
           >
-            {partial
-              ? formatKeyCombination(partial, osType)
-              : t("settings.general.shortcut.pressKeys")}
+            <CapturedKeys
+              partial={partial}
+              osType={osType}
+              size="line"
+              slotLabel={t("settings.general.shortcut.pressKeys")}
+            />
           </div>
         ) : (
           <button
             type="button"
             disabled={disabled || isUpdating(`binding_${shortcutId}`)}
-            className="min-w-12 rounded-lg border border-line bg-logo-primary/12 px-2.5 py-1 text-sm font-semibold hover:border-logo-primary hover:bg-logo-primary/24 focus-visible:outline-2 focus-visible:outline-logo-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="group/keycaps flex min-h-9 min-w-12 cursor-pointer items-center justify-center rounded-lg px-2.5 pb-1 hover:bg-wash focus-visible:outline-2 focus-visible:outline-logo-primary disabled:cursor-not-allowed disabled:opacity-50"
             onClick={start}
             title={translatedName}
+            aria-label={`${translatedName}, ${keycapLabel(binding.current_binding, osType)}`}
+            {...spaceDoesNotClick}
           >
-            {formatKeyCombination(binding.current_binding, osType)}
+            <Keycaps
+              binding={binding.current_binding}
+              osType={osType}
+              size="line"
+            />
           </button>
         )}
         <ResetButton

@@ -1,51 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { getVersion } from "@tauri-apps/api/app";
-
-import ModelSelector from "../model-selector";
-import UpdateChecker from "../update-checker";
+import React from "react";
 import NoticeChip from "./NoticeChip";
 import TranscriptionStatus from "./TranscriptionStatus";
+import { useNoticeStore } from "@/stores/noticeStore";
+import { useModelsLocked } from "@/stores/transcriptionJobsStore";
 
 interface FooterProps {
   onShowHistory: () => void;
 }
 
 const Footer: React.FC<FooterProps> = ({ onShowHistory }) => {
-  const [version, setVersion] = useState("");
-
-  useEffect(() => {
-    const fetchVersion = async () => {
-      try {
-        const appVersion = await getVersion();
-        setVersion(appVersion);
-      } catch (error) {
-        console.error("Failed to get app version:", error);
-        setVersion("0.1.2");
-      }
-    };
-
-    fetchVersion();
-  }, []);
+  const hasJobs = useModelsLocked();
+  const hasNotices = useNoticeStore(
+    (state) =>
+      state.notices.length > 0 || state.local.some((notice) => notice.kept),
+  );
+  if (!hasJobs && !hasNotices) return null;
 
   return (
-    <div className="w-full border-t border-line pt-3">
-      <div className="flex justify-between items-center text-xs px-4 pb-3 text-ink-2">
-        <div className="flex items-center gap-4">
-          <ModelSelector />
-          <TranscriptionStatus onShowHistory={onShowHistory} />
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Update Status */}
-          <div className="flex items-center gap-1">
-            <UpdateChecker />
-            <span>•</span>
-            {/* eslint-disable-next-line i18next/no-literal-string */}
-            <span>v{version}</span>
-          </div>
-          <NoticeChip />
-        </div>
-      </div>
+    <div className="flex w-full items-center justify-end gap-3 border-t border-line px-4 py-2 text-xs text-ink-2">
+      <TranscriptionStatus onShowHistory={onShowHistory} />
+      <NoticeChip />
     </div>
   );
 };

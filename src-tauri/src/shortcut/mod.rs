@@ -638,6 +638,7 @@ pub fn change_sound_theme_setting(app: AppHandle, theme: String) -> Result<(), S
         }
     };
     settings.sound_theme = parsed;
+    settings.recording_sounds = settings::RecordingSounds::default();
     settings::write_settings(&app, settings);
     Ok(())
 }

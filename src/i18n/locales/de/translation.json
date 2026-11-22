@@ -15,7 +15,23 @@
     "autoLanguage": "Automatisch",
     "otherLanguages": "Weitere Sprachen"
   },
+  "home": {
+    "wordsToday": "Wörter heute",
+    "wordsTotal": "Wörter insgesamt",
+    "streak": "Aktuelle Serie",
+    "timeSaved": "Gesparte Stunden",
+    "transcriptions": "Transkriptionen",
+    "activity": "Aktivität",
+    "dailyWords": "Wörter: {{words}}",
+    "less": "Weniger",
+    "more": "Mehr",
+    "estimated": "Schätzung",
+    "timeEstimate": "Bei 150 Wörtern pro Minute beim Sprechen und 50 beim Tippen.",
+    "unavailable": "Die Aktivität konnte nicht geladen werden.",
+    "retry": "Erneut versuchen"
+  },
   "sidebar": {
+    "home": "Startseite",
     "general": "Allgemein",
     "models": "Modelle",
     "advanced": "Erweitert",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Alles bereit",
-      "subMac": "Prism ist jetzt in deiner Menüleiste. Halte <keys/> gedrückt oder tippe darauf, um in jeder App zu sprechen.",
-      "subTray": "Prism ist jetzt in deinem Infobereich. Halte <keys/> gedrückt oder tippe darauf, um in jeder App zu sprechen.",
+      "subMac": "Prism ist bereit. Verwende dein Tastenkürzel in jeder App.",
+      "subTray": "Prism ist bereit. Verwende dein Tastenkürzel in jeder App.",
       "hint": "Du kannst das später in den Einstellungen ändern",
       "highFiveLabel": "High Five",
       "atLogin": "Prism beim Anmelden starten",
@@ -453,9 +469,16 @@
         "average": "Alle Kanäle mitteln",
         "channel": "Kanal {{n}}"
       },
+      "cues": {
+        "start": "Start",
+        "stop": "Stopp",
+        "cancel": "Esc",
+        "custom": "Benutzerdefiniert",
+        "preview": "Ton anhören: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Audio-Feedback",
-        "description": "Ton bei Start und Ende der Aufnahme abspielen"
+        "label": "Aufnahmetöne",
+        "description": "Töne beim Starten, Beenden oder Abbrechen der Aufnahme."
       },
       "outputDevice": {
         "title": "Ausgabegerät",

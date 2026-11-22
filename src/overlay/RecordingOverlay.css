@@ -255,7 +255,7 @@
 .stext-cap .tentative {
   color: var(--s-muted);
 }
-.stext-cap .transcript-word {
+.transcript-word {
   border-radius: 3px;
   background: linear-gradient(
       90deg,
@@ -264,21 +264,16 @@
       transparent 85%
     )
     no-repeat 100% 50% / 245% 100%;
-  animation: transcript-arrive 600ms cubic-bezier(0.18, 0.55, 0.25, 1) both;
+  animation: transcript-arrive 340ms cubic-bezier(0.18, 0.55, 0.25, 1) both;
   transition: color 150ms ease-out;
 }
 
 @keyframes transcript-arrive {
   0% {
-    opacity: 0.45;
     background-position: 100% 50%;
     text-shadow: 0 0 7px #49a3ffae;
   }
-  38% {
-    opacity: 1;
-  }
   100% {
-    opacity: 1;
     background-position: 0 50%;
     text-shadow: none;
   }
@@ -294,14 +289,77 @@
   --s-faint: #a0b3cd;
 }
 
+.ov-stage.mac-notch {
+  --s-surface: #000;
+  --s-border: #272727;
+  --s-muted: #bfc5ce;
+  --s-faint: #bec8d5;
+  --s-hair: #1d2026;
+}
+.ov-stage.mac-notch .scard,
+.ov-stage.mac-notch .scard.open {
+  background: #000;
+  color: #f3f8ff;
+}
+.ov-stage.mac-notch .stext-cap,
+.ov-stage.mac-notch .swork-label,
+.ov-stage.mac-notch .snotice .nlabel {
+  color: #f3f8ff;
+}
+.ov-stage.mac-notch .transcript-word {
+  background-image: linear-gradient(
+    102deg,
+    transparent 13%,
+    #1969ff60 26%,
+    #1e89ffd0 45%,
+    #54c9ffa0 57%,
+    #1253f433 68%,
+    transparent 82%
+  );
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  animation-name: spectral-word;
+  animation-duration: 520ms;
+}
+@keyframes spectral-word {
+  0% {
+    background-position: 100% 50%;
+    color: #fff;
+    text-shadow:
+      0 0 5px #69cbff,
+      0 0 13px #2587ff;
+  }
+  60% {
+    text-shadow: 0 0 7px #278dffb0;
+  }
+  100% {
+    background-position: 0 50%;
+    text-shadow: none;
+  }
+}
+.ov-stage.mac-notch .swave.ready {
+  height: 30px;
+  gap: 4px;
+}
+.ov-stage.mac-notch .swave.ready i {
+  width: 3px;
+  max-height: 30px;
+  background: linear-gradient(#dcfcff, #4ac7ff 51%, #3166fd);
+  box-shadow: 0 0 7px #318affab;
+}
+.ov-stage.mac-notch .smark.ready {
+  filter: brightness(1.33) drop-shadow(0 0 6px #2496ff92);
+}
+.ov-stage.mac-notch [data-speaking] .smark.ready {
+  filter: brightness(1.52) drop-shadow(0 0 9px #33baffc0);
+}
 .ov-stage.docked .scard {
   border-top: 0;
   border-radius: 0 0 23px 23px;
-  border-color: #385274;
-  background: #080d17;
 }
-.ov-stage.docked .scard.open {
-  background: linear-gradient(165deg, #090f1c 28%, #14253c);
+.ov-stage.paste-confirmed .scard {
+  border-color: #47a6ff;
+  box-shadow: inset 0 0 0 1px #47a6ff;
 }
 .ov-stage.docked .sbase {
   color: #edf6ff;
@@ -363,7 +421,7 @@
     animation: none !important;
     transition: none !important;
   }
-  .stext-cap .transcript-word {
+  .ov-stage .stext-cap .transcript-word {
     background-image: none;
   }
 }
@@ -508,10 +566,18 @@
   color: var(--s-muted);
   background: var(--s-hair);
   cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
   transition:
+    opacity 130ms ease,
     background-color 150ms ease,
     color 150ms ease,
     transform 100ms ease;
+}
+.scard:hover .sx,
+.sx:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 .sx svg {
   width: 9px;

@@ -9,8 +9,12 @@ use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;
 use tauri_specta::Event;
+use unicode_segmentation::UnicodeSegmentation;
 
 use crate::language_detection::{LanguageDecision, LanguageSource};
+
+mod activity;
+pub use activity::ActivitySummary;
 
 /// Database migrations for transcription history.
 /// Each migration is applied in order. The library tracks which migrations
@@ -143,6 +147,7 @@ impl HistoryManager {
         debug!("Database version before migration: {}", version_before);
 
         Self::apply_migrations(&mut conn)?;
+        activity::initialize(&mut conn)?;
 
         // Get version after migration
         let version_after: i32 = conn.pragma_query_value(None, "user_version", |row| row.get(0))?;
@@ -275,6 +280,13 @@ impl HistoryManager {
         })
     }
 
+    pub fn activity_summary(&self) -> Result<ActivitySummary> {
+        Ok(activity::summary(
+            &self.get_connection()?,
+            Local::now().date_naive(),
+        )?)
+    }
+
     pub fn recordings_dir(&self) -> &std::path::Path {
         &self.recordings_dir
     }
@@ -335,8 +347,9 @@ impl HistoryManager {
     fn insert_entry(&self, mut entry: HistoryEntry) -> Result<HistoryEntry> {
         entry.title = self.format_timestamp_title(entry.timestamp);
 
-        let conn = self.get_connection()?;
-        conn.execute(
+        let mut conn = self.get_connection()?;
+        let tx = conn.transaction()?;
+        tx.execute(
             "INSERT INTO transcription_history (
                 file_name,
                 timestamp,
@@ -364,7 +377,14 @@ impl HistoryManager {
                 entry.language_source.map(LanguageSource::as_str),
             ],
         )?;
-        entry.id = conn.last_insert_rowid();
+        entry.id = tx.last_insert_rowid();
+        activity::record(
+            &tx,
+            entry.timestamp,
+            &entry.transcription_text,
+            entry.source_name.is_none(),
+        )?;
+        tx.commit()?;
 
         debug!("Saved history entry with id {}", entry.id);
 
@@ -390,8 +410,22 @@ impl HistoryManager {
         language: Option<LanguageDecision>,
     ) -> Result<HistoryEntry> {
         let (language, language_source) = split_language(language);
-        let conn = self.get_connection()?;
-        let updated = conn.execute(
+        let mut conn = self.get_connection()?;
+        let tx = conn.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+        let had_words = tx
+            .query_row(
+                "SELECT transcription_text FROM transcription_history WHERE id = ?1",
+                [id],
+                |row| {
+                    let text: String = row.get(0)?;
+                    Ok(text.unicode_words().next().is_some())
+                },
+            )
+            .optional()?;
+        let Some(had_words) = had_words else {
+            return Err(anyhow!("History entry {} not found", id));
+        };
+        tx.execute(
             "UPDATE transcription_history
              SET transcription_text = ?1,
                  post_processed_text = ?2,
@@ -409,15 +443,22 @@ impl HistoryManager {
             ],
         )?;
 
-        if updated == 0 {
-            return Err(anyhow!("History entry {} not found", id));
-        }
-
-        let entry = conn.query_row(
+        let entry = tx.query_row(
             &format!("SELECT {ENTRY_COLUMNS} FROM transcription_history WHERE id = ?1"),
             params![id],
             Self::map_history_entry,
         )?;
+
+        // Retries only add to usage when a previously empty entry first completes.
+        if !had_words {
+            activity::record(
+                &tx,
+                entry.timestamp,
+                &entry.transcription_text,
+                entry.source_name.is_none(),
+            )?;
+        }
+        tx.commit()?;
 
         debug!("Updated transcription for history entry {}", id);
 

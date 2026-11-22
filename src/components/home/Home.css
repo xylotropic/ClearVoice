@@ -1,0 +1,207 @@
+.prism-home {
+  --calendar-blue-1: #d8eaff;
+  --calendar-blue-2: #98c6fe;
+  --calendar-blue-3: #4a96ed;
+  --calendar-blue-4: #1455b9;
+  --calendar-neutral: var(--color-wash);
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  max-width: 768px;
+}
+
+.prism-home-totals {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.prism-stat {
+  position: relative;
+  grid-column: span 2;
+  min-height: 77px;
+  padding: 11px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 13px;
+}
+
+.prism-stat:is(.prism-stat-wordsToday, .prism-stat-wordsTotal) {
+  grid-column: span 3;
+  padding: 14px 15px;
+}
+
+.prism-stat-wordsToday {
+  background: color-mix(
+    in srgb,
+    var(--color-logo-primary) 23%,
+    var(--color-background)
+  );
+  border-color: color-mix(
+    in srgb,
+    var(--color-logo-primary) 52%,
+    var(--color-line)
+  );
+}
+
+.prism-stat dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--color-ink-2);
+}
+
+.prism-stat dt svg {
+  flex: none;
+  color: var(--color-plum);
+}
+
+.prism-stat dd {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(16px, 3.1vw, 25px);
+  line-height: 1.14;
+  letter-spacing: -0.055em;
+  font-weight: 670;
+  font-variant-numeric: tabular-nums;
+}
+
+.prism-stat:is(.prism-stat-wordsToday, .prism-stat-wordsTotal) dd {
+  font-size: clamp(27px, 5vw, 42px);
+  color: var(--color-text);
+}
+
+.prism-stat-detail {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.18em;
+  color: var(--color-ink-2);
+  font-size: 10px;
+}
+
+.prism-activity {
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  padding: 15px;
+}
+
+.prism-activity-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.prism-activity-heading h2 {
+  font-size: 15px;
+  font-weight: 655;
+  letter-spacing: -0.02em;
+}
+
+.prism-activity-detail,
+.prism-activity-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-ink-2);
+}
+
+.prism-activity-detail span {
+  padding-inline-start: 8px;
+  border-inline-start: 1px solid var(--color-line-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.prism-calendar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 8px;
+  --calendar-columns: repeat(16, minmax(0, 1fr));
+  --calendar-rows: repeat(7, minmax(11px, 16px));
+}
+
+.prism-calendar-labels,
+.prism-calendar-months {
+  font-size: 10px;
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
+
+.prism-calendar-labels {
+  grid-area: 2 / 1;
+  display: grid;
+  grid-template-rows: var(--calendar-rows);
+  gap: 3px;
+  align-items: center;
+}
+
+.prism-calendar-months {
+  grid-area: 1 / 2;
+  display: grid;
+  grid-template-columns: var(--calendar-columns);
+  gap: 3px;
+}
+
+.prism-calendar-days {
+  grid-area: 2 / 2;
+  display: grid;
+  grid-template-columns: var(--calendar-columns);
+  grid-template-rows: var(--calendar-rows);
+  grid-auto-flow: column;
+  gap: 3px;
+}
+
+.prism-calendar-days button,
+.prism-activity-legend i {
+  border: 0;
+  border-radius: 3px;
+  background: var(--calendar-neutral);
+}
+
+.prism-home [data-level="1"] {
+  background: var(--calendar-blue-1);
+}
+.prism-home [data-level="2"] {
+  background: var(--calendar-blue-2);
+}
+.prism-home [data-level="3"] {
+  background: var(--calendar-blue-3);
+}
+.prism-home [data-level="4"] {
+  background: var(--calendar-blue-4);
+}
+
+.prism-calendar-days button[aria-current="date"] {
+  box-shadow: inset 0 0 0 1px var(--calendar-blue-3);
+}
+
+.prism-calendar-days button:hover,
+.prism-calendar-days button:focus-visible {
+  outline: 1px solid var(--color-text);
+  outline-offset: 1px;
+  cursor: pointer;
+}
+
+.prism-activity-legend {
+  justify-content: flex-end;
+  margin-top: 10px;
+  gap: 3px;
+}
+
+.prism-activity-legend span {
+  margin-inline: 4px;
+}
+.prism-activity-legend i {
+  width: 11px;
+  height: 11px;
+}
+
+:root[data-theme="dark"] .prism-home {
+  --calendar-neutral: var(--color-line);
+}

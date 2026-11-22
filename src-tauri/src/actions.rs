@@ -961,6 +961,14 @@ impl ShortcutAction for TranscribeAction {
                                             (true, Some(notice)) => {
                                                 notices::raise(&ah_clone, notice)
                                             }
+                                            (true, None)
+                                                if matches!(
+                                                    outcome,
+                                                    TranscriptionOutcome::Typed
+                                                ) =>
+                                            {
+                                                crate::overlay::show_paste_confirmation(&ah_clone);
+                                            }
                                             (true, None) => {
                                                 utils::hide_recording_overlay(&ah_clone)
                                             }

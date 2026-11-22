@@ -849,6 +849,7 @@ pub fn run(cli_args: CliArgs) {
             commands::audio::set_selected_output_device,
             commands::audio::get_selected_output_device,
             commands::audio::play_test_sound,
+            commands::audio::change_recording_sounds,
             commands::audio::check_custom_sounds,
             commands::audio::set_clamshell_microphone,
             commands::audio::get_clamshell_microphone,
@@ -861,6 +862,7 @@ pub fn run(cli_args: CliArgs) {
             commands::transcription::get_language_status,
             commands::transcription::unload_model_manually,
             commands::history::get_history_entries,
+            commands::history::get_activity_summary,
             commands::history::toggle_history_entry_saved,
             commands::history::get_audio_file_path,
             commands::history::delete_history_entry,
@@ -1262,6 +1264,7 @@ pub fn run(cli_args: CliArgs) {
                 .unwrap_or(false);
             if !window_visible {
                 tray::recreate_tray_icon(app);
+                let _ = app.emit_to("main", "tray-action", "home");
             }
             show_main_window(app);
         }

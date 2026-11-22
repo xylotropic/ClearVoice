@@ -15,7 +15,23 @@
     "autoLanguage": "Automatycznie",
     "otherLanguages": "Inne języki"
   },
+  "home": {
+    "wordsToday": "Słowa dzisiaj",
+    "wordsTotal": "Słowa łącznie",
+    "streak": "Bieżąca seria",
+    "timeSaved": "Zaoszczędzone godziny",
+    "transcriptions": "Transkrypcje",
+    "activity": "Aktywność",
+    "dailyWords": "Słowa: {{words}}",
+    "less": "Mniej",
+    "more": "Więcej",
+    "estimated": "Szacunek",
+    "timeEstimate": "Przy 150 słowach na minutę podczas mówienia i 50 podczas pisania.",
+    "unavailable": "Nie udało się wczytać aktywności.",
+    "retry": "Spróbuj ponownie"
+  },
   "sidebar": {
+    "home": "Strona główna",
     "general": "Ogólne",
     "models": "Modele",
     "advanced": "Zaawansowane",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Wszystko gotowe",
-      "subMac": "Prism jest teraz na pasku menu. Przytrzymaj lub naciśnij <keys/> w dowolnej aplikacji, aby mówić.",
-      "subTray": "Prism jest teraz w zasobniku systemowym. Przytrzymaj lub naciśnij <keys/> w dowolnej aplikacji, aby mówić.",
+      "subMac": "Prism jest gotowy. Używaj skrótu w dowolnej aplikacji.",
+      "subTray": "Prism jest gotowy. Używaj skrótu w dowolnej aplikacji.",
       "hint": "Możesz to później zmienić w Ustawieniach",
       "highFiveLabel": "Piątka",
       "atLogin": "Uruchamiaj Prism po zalogowaniu",
@@ -453,9 +469,16 @@
         "average": "Uśrednij wszystkie kanały",
         "channel": "Kanał {{n}}"
       },
+      "cues": {
+        "start": "Start",
+        "stop": "Koniec",
+        "cancel": "Esc",
+        "custom": "Własny",
+        "preview": "Odsłuchaj dźwięk: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Informacja dźwiękowa",
-        "description": "Odtwarzaj dźwięk przy rozpoczęciu i zakończeniu nagrywania"
+        "label": "Dźwięki nagrywania",
+        "description": "Odtwarzaj dźwięk przy rozpoczęciu, zakończeniu lub anulowaniu nagrywania."
       },
       "outputDevice": {
         "title": "Urządzenie wyjściowe",

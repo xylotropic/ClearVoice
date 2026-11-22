@@ -15,7 +15,23 @@
     "autoLanguage": "Automatisch",
     "otherLanguages": "Andere talen"
   },
+  "home": {
+    "wordsToday": "Woorden vandaag",
+    "wordsTotal": "Woorden totaal",
+    "streak": "Huidige reeks",
+    "timeSaved": "Uren bespaard",
+    "transcriptions": "Transcripties",
+    "activity": "Activiteit",
+    "dailyWords": "Woorden: {{words}}",
+    "less": "Minder",
+    "more": "Meer",
+    "estimated": "Schatting",
+    "timeEstimate": "Bij 150 gesproken en 50 getypte woorden per minuut.",
+    "unavailable": "Activiteit kan niet worden geladen.",
+    "retry": "Opnieuw proberen"
+  },
   "sidebar": {
+    "home": "Start",
     "general": "Algemeen",
     "models": "Modellen",
     "advanced": "Geavanceerd",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Alles is klaar",
-      "subMac": "Prism staat nu in je menubalk. Houd <keys/> ingedrukt of tik erop in elke app om te praten.",
-      "subTray": "Prism staat nu in je systeemvak. Houd <keys/> ingedrukt of tik erop in elke app om te praten.",
+      "subMac": "Prism is klaar. Gebruik de sneltoets in elke app.",
+      "subTray": "Prism is klaar. Gebruik de sneltoets in elke app.",
       "hint": "Je kunt dit later wijzigen in de instellingen",
       "highFiveLabel": "High five",
       "atLogin": "Prism starten als ik inlog",
@@ -453,9 +469,16 @@
         "average": "Gemiddelde van alle kanalen",
         "channel": "Kanaal {{n}}"
       },
+      "cues": {
+        "start": "Start",
+        "stop": "Stop",
+        "cancel": "Esc",
+        "custom": "Aangepast",
+        "preview": "Geluid beluisteren: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Geluidsfeedback",
-        "description": "Geluid afspelen wanneer de opname start en stopt"
+        "label": "Opnamegeluiden",
+        "description": "Speel geluid af bij starten, stoppen of annuleren."
       },
       "outputDevice": {
         "title": "Afspeelapparaat",

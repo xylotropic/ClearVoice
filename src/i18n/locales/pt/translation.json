@@ -15,7 +15,23 @@
     "autoLanguage": "Automático",
     "otherLanguages": "Outros idiomas"
   },
+  "home": {
+    "wordsToday": "Palavras de hoje",
+    "wordsTotal": "Total de palavras",
+    "streak": "Sequência atual",
+    "timeSaved": "Horas poupadas",
+    "transcriptions": "Transcrições",
+    "activity": "Atividade",
+    "dailyWords": "Palavras: {{words}}",
+    "less": "Menos",
+    "more": "Mais",
+    "estimated": "Estimativa",
+    "timeEstimate": "Com 150 palavras/min ao falar e 50 ao digitar.",
+    "unavailable": "Não foi possível carregar a atividade.",
+    "retry": "Tentar novamente"
+  },
   "sidebar": {
+    "home": "Início",
     "general": "Geral",
     "models": "Modelos",
     "advanced": "Avançado",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Tudo pronto",
-      "subMac": "O Prism agora está na barra de menus. Mantenha pressionado ou toque em <keys/> em qualquer app para falar.",
-      "subTray": "O Prism agora está na bandeja do sistema. Mantenha pressionado ou toque em <keys/> em qualquer app para falar.",
+      "subMac": "O Prism está pronto. Use o atalho em qualquer aplicativo.",
+      "subTray": "O Prism está pronto. Use o atalho em qualquer aplicativo.",
       "hint": "Você pode alterar isso depois nos Ajustes",
       "highFiveLabel": "Toca aqui",
       "atLogin": "Abrir o Prism quando eu entrar",
@@ -453,9 +469,16 @@
         "average": "Média de todos os canais",
         "channel": "Canal {{n}}"
       },
+      "cues": {
+        "start": "Início",
+        "stop": "Fim",
+        "cancel": "Esc",
+        "custom": "Personalizado",
+        "preview": "Ouvir som: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Feedback de Áudio",
-        "description": "Reproduzir som quando a gravação iniciar e parar"
+        "label": "Sons da gravação",
+        "description": "Reproduz sons ao iniciar, terminar ou cancelar uma gravação."
       },
       "outputDevice": {
         "title": "Dispositivo de Saída",

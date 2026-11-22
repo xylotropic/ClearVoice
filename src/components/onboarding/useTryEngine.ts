@@ -44,6 +44,7 @@ export const useTryEngine = ({ os }: { os: OSType }) => {
   const { preview, lessons, setLessons } = useOnboardingStore();
   const shortcut = getSetting("bindings")?.transcribe?.current_binding ?? "";
   const threshold = getSetting("hold_threshold_ms") ?? 300;
+  const toggle = getSetting("shortcut_activation") === "toggle";
 
   /** The current take's way, once known. */
   const [take, setTake] = useState<Mode | null>(null);
@@ -117,10 +118,12 @@ export const useTryEngine = ({ os }: { os: OSType }) => {
         flushSettle();
         // The last result stays up until this take's way is known.
         clearTimeout(resultTimer.current);
-        lockedRef.current = false;
-        setRecordDown(true);
+        lockedRef.current = toggle;
+        setWay(toggle ? "tap" : null);
+        setRecordDown(!toggle);
         setPhase("listening");
         clearTimeout(holdTimer.current);
+        if (toggle) return;
         // Past the threshold without locking: a hold.
         holdTimer.current = setTimeout(() => {
           if (!lockedRef.current) setWay("hold");
@@ -225,7 +228,7 @@ export const useTryEngine = ({ os }: { os: OSType }) => {
       offState.then((off) => off());
       offDone.then((off) => off());
     };
-  }, [setLessons, threshold]);
+  }, [setLessons, threshold, toggle]);
 
   // Refocus the note after a shortcut change so the next take lands there.
   const capture = useShortcutCapture("transcribe", os, {

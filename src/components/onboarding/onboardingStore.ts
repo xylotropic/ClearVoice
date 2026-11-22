@@ -43,6 +43,7 @@ interface Persisted {
   returnTo: OnboardingStep | null;
   /** Start Handy at login: set on All set, saved when they finish. */
   atLogin: boolean;
+  startHidden: boolean;
 }
 
 interface OnboardingState extends Persisted {
@@ -70,6 +71,7 @@ const fresh = (): Persisted => ({
   lessons: { hold: false, tap: false },
   returnTo: null,
   atLogin: false,
+  startHidden: false,
 });
 
 const isStringList = (v: unknown): v is string[] =>
@@ -104,6 +106,7 @@ const load = (): Persisted => {
         (v) => v === null || STEP_ORDER.includes(v as OnboardingStep),
       ),
       atLogin: pick("atLogin", isBool),
+      startHidden: pick("startHidden", isBool),
       lessons: pick(
         "lessons",
         (v) =>
@@ -131,6 +134,7 @@ const save = (state: OnboardingState) => {
     lessons: state.lessons,
     returnTo: state.returnTo,
     atLogin: state.atLogin,
+    startHidden: state.startHidden,
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));

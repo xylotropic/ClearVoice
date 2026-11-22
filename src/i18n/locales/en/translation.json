@@ -15,7 +15,23 @@
     "autoLanguage": "Auto",
     "otherLanguages": "Other Languages"
   },
+  "home": {
+    "wordsToday": "Words today",
+    "wordsTotal": "Total words",
+    "streak": "Current streak",
+    "timeSaved": "Hours saved",
+    "transcriptions": "Transcriptions",
+    "activity": "Activity",
+    "dailyWords": "Words: {{words}}",
+    "less": "Less",
+    "more": "More",
+    "estimated": "Estimate",
+    "timeEstimate": "Estimated at 150 words/min speaking and 50 words/min typing.",
+    "unavailable": "Activity couldn’t load.",
+    "retry": "Try again"
+  },
   "sidebar": {
+    "home": "Home",
     "general": "General",
     "models": "Models",
     "advanced": "Advanced",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "You're all set",
-      "subMac": "Prism's in your menu bar now. Hold <keys/> in any app to talk. Release to paste.",
-      "subTray": "Prism's in your system tray now. Hold <keys/> in any app to talk. Release to paste.",
+      "subMac": "Prism is ready. Use your shortcut in any app.",
+      "subTray": "Prism is ready. Use your shortcut in any app.",
       "hint": "You can change these later in Settings",
       "highFiveLabel": "High five",
       "atLogin": "Start Prism when I log in",
@@ -453,9 +469,16 @@
         "average": "Average all channels",
         "channel": "Channel {{n}}"
       },
+      "cues": {
+        "start": "Start",
+        "stop": "Stop",
+        "cancel": "Escape",
+        "custom": "Custom",
+        "preview": "Preview sound: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Audio Feedback",
-        "description": "Play sound when recording starts and stops"
+        "label": "Recording sounds",
+        "description": "Play sounds when you start, finish, or cancel a recording."
       },
       "outputDevice": {
         "title": "Output Device",

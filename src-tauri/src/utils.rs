@@ -227,7 +227,11 @@ pub fn cancel_current_operation(app: &AppHandle) {
     // Cancel any ongoing recording
     let audio_manager = app.state::<Arc<AudioRecordingManager>>();
     let recording_was_active = audio_manager.is_recording();
+    let had_session = recording_was_active || crate::tray::dictation_in_progress(app);
     audio_manager.cancel_recording();
+    if had_session {
+        crate::audio_feedback::play_feedback_sound(app, crate::audio_feedback::SoundType::Cancel);
+    }
 
     // Abandon any live streaming transcription, and stop a transcription
     // already in progress

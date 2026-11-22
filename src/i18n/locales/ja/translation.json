@@ -15,7 +15,23 @@
     "autoLanguage": "自動",
     "otherLanguages": "その他の言語"
   },
+  "home": {
+    "wordsToday": "今日の単語数",
+    "wordsTotal": "単語数の合計",
+    "streak": "連続利用日数",
+    "timeSaved": "節約した時間",
+    "transcriptions": "文字起こし回数",
+    "activity": "アクティビティ",
+    "dailyWords": "単語数：{{words}}",
+    "less": "少ない",
+    "more": "多い",
+    "estimated": "推定",
+    "timeEstimate": "話す速度を毎分150語、入力速度を毎分50語として計算。",
+    "unavailable": "アクティビティを読み込めませんでした。",
+    "retry": "再試行"
+  },
   "sidebar": {
+    "home": "ホーム",
     "general": "一般",
     "models": "モデル",
     "advanced": "詳細設定",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "準備完了です",
-      "subMac": "Prism はメニューバーにいます。どのアプリでも <keys/> を押したまま、またはタップして話してください。",
-      "subTray": "Prism はシステムトレイにいます。どのアプリでも <keys/> を押したまま、またはタップして話してください。",
+      "subMac": "Prismの準備ができました。どのアプリでもショートカットを使えます。",
+      "subTray": "Prismの準備ができました。どのアプリでもショートカットを使えます。",
       "hint": "これらは後から設定で変更できます",
       "highFiveLabel": "ハイタッチ",
       "atLogin": "ログイン時に Prism を起動する",
@@ -453,9 +469,16 @@
         "average": "すべてのチャンネルの平均",
         "channel": "チャンネル{{n}}"
       },
+      "cues": {
+        "start": "開始",
+        "stop": "終了",
+        "cancel": "Esc",
+        "custom": "カスタム",
+        "preview": "音を試聴：{{cue}}"
+      },
       "audioFeedback": {
-        "label": "オーディオフィードバック",
-        "description": "録音の開始と停止時にサウンドを再生"
+        "label": "録音の効果音",
+        "description": "録音の開始、終了、キャンセル時に音を鳴らします。"
       },
       "outputDevice": {
         "title": "出力デバイス",

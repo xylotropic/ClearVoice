@@ -48,8 +48,9 @@ export function TryIt({
 }: TryItProps) {
   const { t, i18n } = useTranslation();
   const test = useTryEngine({ os });
-  const { languages, atLogin, set } = useOnboardingStore();
-  const { refreshAudioDevices } = useSettings();
+  const { languages, atLogin, startHidden, set } = useOnboardingStore();
+  const { refreshAudioDevices, getSetting } = useSettings();
+  const toggle = getSetting("shortcut_activation") === "toggle";
   const { field, result, phase, waiting, lessons } = test;
   const languagesText = languageList(languages, i18n.language);
   const tested = lessons.hold || lessons.tap;
@@ -94,7 +95,7 @@ export function TryIt({
       return (
         <Trans
           i18nKey={
-            test.take === "tap"
+            toggle || test.take === "tap"
               ? "onboarding.try.tapAgain"
               : "onboarding.try.letGo"
           }
@@ -118,7 +119,12 @@ export function TryIt({
           </>
         );
       default:
-        return <Trans i18nKey="onboarding.try.hold" components={{ keys }} />;
+        return (
+          <Trans
+            i18nKey={toggle ? "onboarding.try.tapNext" : "onboarding.try.hold"}
+            components={{ keys }}
+          />
+        );
     }
   };
 
@@ -161,18 +167,13 @@ export function TryIt({
           <ScreenHeader
             title={t(stepTitle)}
             sub={
-              finished ? (
-                <Trans
-                  i18nKey={
+              finished
+                ? t(
                     os === "macos"
                       ? "onboarding.done.subMac"
-                      : "onboarding.done.subTray"
-                  }
-                  components={{ keys }}
-                />
-              ) : (
-                t("onboarding.try.subtitle")
-              )
+                      : "onboarding.done.subTray",
+                  )
+                : t("onboarding.try.subtitle")
             }
             subClassName="mx-auto max-w-[400px]"
           />
@@ -220,6 +221,18 @@ export function TryIt({
                     ariaLabelledBy="onboarding-at-login"
                   />
                 </div>
+                {atLogin && (
+                  <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+                    <span id="onboarding-start-hidden" className="font-medium">
+                      {t("settings.advanced.startHidden.label")}
+                    </span>
+                    <Switch
+                      checked={startHidden}
+                      onChange={(value) => set({ startHidden: value })}
+                      ariaLabelledBy="onboarding-start-hidden"
+                    />
+                  </div>
+                )}
               </div>
             </>
           ) : (

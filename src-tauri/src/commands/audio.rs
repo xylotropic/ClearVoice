@@ -318,12 +318,21 @@ pub async fn play_test_sound(app: AppHandle, sound_type: String) {
     let sound = match sound_type.as_str() {
         "start" => audio_feedback::SoundType::Start,
         "stop" => audio_feedback::SoundType::Stop,
+        "cancel" => audio_feedback::SoundType::Cancel,
         _ => {
             warn!("Unknown sound type: {}", sound_type);
             return;
         }
     };
-    audio_feedback::play_test_sound(&app, sound);
+    let _ = tokio::task::spawn_blocking(move || audio_feedback::play_test_sound(&app, sound)).await;
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn change_recording_sounds(app: AppHandle, sounds: crate::settings::RecordingSounds) {
+    let mut settings = get_settings(&app);
+    settings.recording_sounds = sounds;
+    write_settings(&app, settings);
 }
 
 #[tauri::command]

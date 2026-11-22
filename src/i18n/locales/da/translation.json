@@ -15,7 +15,23 @@
     "autoLanguage": "Automatisk",
     "otherLanguages": "Andre sprog"
   },
+  "home": {
+    "wordsToday": "Ord i dag",
+    "wordsTotal": "Ord i alt",
+    "streak": "Aktuel stime",
+    "timeSaved": "Sparede timer",
+    "transcriptions": "Transskriptioner",
+    "activity": "Aktivitet",
+    "dailyWords": "Ord: {{words}}",
+    "less": "Mindre",
+    "more": "Mere",
+    "estimated": "Estimat",
+    "timeEstimate": "Ved 150 talte og 50 tastede ord pr. minut.",
+    "unavailable": "Aktivitet kunne ikke indlæses.",
+    "retry": "Prøv igen"
+  },
   "sidebar": {
+    "home": "Hjem",
     "general": "Generelt",
     "models": "Modeller",
     "advanced": "Avanceret",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Så er du klar",
-      "subMac": "Prism ligger nu i din menulinje. Hold eller tryk på <keys/> i en vilkårlig app for at tale.",
-      "subTray": "Prism ligger nu i dit meddelelsesområde. Hold eller tryk på <keys/> i en vilkårlig app for at tale.",
+      "subMac": "Prism er klar. Brug din genvej i enhver app.",
+      "subTray": "Prism er klar. Brug din genvej i enhver app.",
       "hint": "Du kan ændre disse senere i Indstillinger",
       "highFiveLabel": "Highfive",
       "atLogin": "Start Prism, når jeg logger ind",
@@ -453,9 +469,16 @@
         "average": "Gennemsnit af alle kanaler",
         "channel": "Kanal {{n}}"
       },
+      "cues": {
+        "start": "Start",
+        "stop": "Stop",
+        "cancel": "Esc",
+        "custom": "Brugerdefineret",
+        "preview": "Afspil lyd: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Lydfeedback",
-        "description": "Afspil lyd, når optagelse starter og stopper"
+        "label": "Optagelseslyde",
+        "description": "Afspiller lyde ved start, stop og annullering."
       },
       "outputDevice": {
         "title": "Outputenhed",

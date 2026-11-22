@@ -15,7 +15,23 @@
     "autoLanguage": "Automatiskt",
     "otherLanguages": "Andra språk"
   },
+  "home": {
+    "wordsToday": "Ord i dag",
+    "wordsTotal": "Ord totalt",
+    "streak": "Aktuell svit",
+    "timeSaved": "Sparade timmar",
+    "transcriptions": "Transkriptioner",
+    "activity": "Aktivitet",
+    "dailyWords": "Ord: {{words}}",
+    "less": "Mindre",
+    "more": "Mer",
+    "estimated": "Uppskattning",
+    "timeEstimate": "Vid 150 talade och 50 skrivna ord per minut.",
+    "unavailable": "Aktiviteten kunde inte läsas in.",
+    "retry": "Försök igen"
+  },
   "sidebar": {
+    "home": "Hem",
     "general": "Allmänt",
     "models": "Modeller",
     "advanced": "Avancerat",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "Nu är allt klart",
-      "subMac": "Prism finns nu i menyraden. Håll in eller tryck på <keys/> i valfri app för att tala.",
-      "subTray": "Prism finns nu i systemfältet. Håll in eller tryck på <keys/> i valfri app för att tala.",
+      "subMac": "Prism är redo. Använd kortkommandot i valfri app.",
+      "subTray": "Prism är redo. Använd kortkommandot i valfri app.",
       "hint": "Du kan ändra detta senare i Inställningar",
       "highFiveLabel": "Femman",
       "atLogin": "Starta Prism när jag loggar in",
@@ -453,9 +469,16 @@
         "average": "Medelvärde av alla kanaler",
         "channel": "Kanal {{n}}"
       },
+      "cues": {
+        "start": "Start",
+        "stop": "Stopp",
+        "cancel": "Esc",
+        "custom": "Anpassad",
+        "preview": "Förhandslyssna: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "Ljudåterkoppling",
-        "description": "Spela upp ljud när inspelningen startar och stoppar"
+        "label": "Inspelningsljud",
+        "description": "Spela upp ljud när inspelningen startas, stoppas eller avbryts."
       },
       "outputDevice": {
         "title": "Utmatningsenhet",

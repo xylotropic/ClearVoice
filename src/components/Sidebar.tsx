@@ -5,10 +5,12 @@ import {
   FlaskConical,
   History,
   Info,
+  House,
   Sparkles,
   Cpu,
   AudioLines,
 } from "lucide-react";
+import { Home } from "./home/Home";
 import PrismWordmark from "./icons/PrismWordmark";
 import { useSettings } from "../hooks/useSettings";
 import {
@@ -39,6 +41,12 @@ interface SectionConfig {
 }
 
 export const SECTIONS_CONFIG = {
+  home: {
+    labelKey: "sidebar.home",
+    icon: House,
+    component: Home,
+    enabled: () => true,
+  },
   general: {
     labelKey: "sidebar.general",
     icon: AudioLines,

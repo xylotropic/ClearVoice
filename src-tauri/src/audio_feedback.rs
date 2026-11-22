@@ -13,6 +13,7 @@ use tauri::{AppHandle, Manager};
 pub enum SoundType {
     Start,
     Stop,
+    Cancel,
 }
 
 fn resolve_sound_path(
@@ -20,30 +21,33 @@ fn resolve_sound_path(
     settings: &AppSettings,
     sound_type: SoundType,
 ) -> Option<PathBuf> {
-    let sound_file = get_sound_path(settings, sound_type);
-    let base_dir = get_sound_base_dir(settings);
-    match base_dir {
-        tauri::path::BaseDirectory::AppData => {
-            crate::portable::resolve_app_data(app, &sound_file).ok()
+    let selected = match sound_type {
+        SoundType::Start => settings.recording_sounds.start,
+        SoundType::Stop => settings.recording_sounds.stop,
+        SoundType::Cancel => settings.recording_sounds.cancel,
+    };
+    let mut theme = selected.unwrap_or(settings.sound_theme);
+    if theme == SoundTheme::Custom {
+        let name = match sound_type {
+            SoundType::Start => "custom_start.wav",
+            SoundType::Stop => "custom_stop.wav",
+            SoundType::Cancel => "custom_cancel.wav",
+        };
+        let custom = crate::portable::resolve_app_data(app, name).ok();
+        if custom.as_ref().is_some_and(|path| path.is_file()) {
+            return custom;
         }
-        _ => app.path().resolve(&sound_file, base_dir).ok(),
+        theme = SoundTheme::Marimba;
     }
-}
-
-fn get_sound_path(settings: &AppSettings, sound_type: SoundType) -> String {
-    match (settings.sound_theme, sound_type) {
-        (SoundTheme::Custom, SoundType::Start) => "custom_start.wav".to_string(),
-        (SoundTheme::Custom, SoundType::Stop) => "custom_stop.wav".to_string(),
-        (_, SoundType::Start) => settings.sound_theme.to_start_path(),
-        (_, SoundType::Stop) => settings.sound_theme.to_stop_path(),
-    }
-}
-
-fn get_sound_base_dir(settings: &AppSettings) -> tauri::path::BaseDirectory {
-    match settings.sound_theme {
-        SoundTheme::Custom => tauri::path::BaseDirectory::AppData,
-        _ => tauri::path::BaseDirectory::Resource,
-    }
+    let sound_file = match sound_type {
+        SoundType::Start => theme.to_start_path(),
+        SoundType::Stop => theme.to_stop_path(),
+        SoundType::Cancel if theme == SoundTheme::Pop => "resources/pop_cancel.wav".into(),
+        SoundType::Cancel => "resources/marimba_cancel.wav".into(),
+    };
+    app.path()
+        .resolve(&sound_file, tauri::path::BaseDirectory::Resource)
+        .ok()
 }
 
 pub fn play_feedback_sound(app: &AppHandle, sound_type: SoundType) {

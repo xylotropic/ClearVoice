@@ -16,6 +16,7 @@ import {
 import "./App.css";
 import SecureInputWarning from "./components/SecureInputWarning";
 import Footer from "./components/footer";
+import UpdateChecker from "./components/update-checker/UpdateChecker";
 import { OnboardingFlow } from "./components/onboarding/OnboardingFlow";
 import ModelMigration from "./components/onboarding/ModelMigration";
 import {
@@ -49,6 +50,7 @@ type OnboardingStep =
   | "done";
 
 const TRAY_SECTIONS = {
+  home: "home",
   settings: "general",
   shortcuts: "general",
   language_settings: "general",
@@ -84,7 +86,7 @@ const renderSettingsContent = (
   }
 
   const ActiveComponent =
-    SECTIONS_CONFIG[section]?.component || SECTIONS_CONFIG.general.component;
+    SECTIONS_CONFIG[section]?.component || SECTIONS_CONFIG.home.component;
   return <ActiveComponent />;
 };
 
@@ -98,8 +100,7 @@ function App() {
   // Set when a returning user's selected model is a retired (ONNX) model that
   // is still on disk: they must update it before the app can transcribe.
   const [migrationModelId, setMigrationModelId] = useState<string | null>(null);
-  const [currentSection, setCurrentSection] =
-    useState<SidebarSection>("general");
+  const [currentSection, setCurrentSection] = useState<SidebarSection>("home");
   const [trayAction, setTrayAction] = useState<TrayAction | null>(null);
   const showHistory = useCallback(() => setCurrentSection("history"), []);
   const { settings, updateSetting } = useSettings();
@@ -399,6 +400,7 @@ function App() {
                   </h1>
                 )}
                 <SecureInputWarning />
+                <UpdateChecker onlyWhenActive />
                 {renderSettingsContent(
                   currentSection,
                   setOnboardingPreview,

@@ -15,7 +15,23 @@
     "autoLanguage": "자동",
     "otherLanguages": "기타 언어"
   },
+  "home": {
+    "wordsToday": "오늘의 단어 수",
+    "wordsTotal": "전체 단어 수",
+    "streak": "연속 사용일",
+    "timeSaved": "절약한 시간",
+    "transcriptions": "전사 횟수",
+    "activity": "활동",
+    "dailyWords": "단어 수: {{words}}",
+    "less": "적음",
+    "more": "많음",
+    "estimated": "추정치",
+    "timeEstimate": "말하기 분당 150단어, 타이핑 분당 50단어 기준입니다.",
+    "unavailable": "활동을 불러오지 못했습니다.",
+    "retry": "다시 시도"
+  },
   "sidebar": {
+    "home": "홈",
     "general": "일반",
     "models": "모델",
     "advanced": "고급",
@@ -201,8 +217,8 @@
     },
     "done": {
       "title": "준비 완료!",
-      "subMac": "이제 Handy가 메뉴 막대에 있습니다. 어떤 앱에서든 <keys/>를 누르거나 탭해서 말하세요.",
-      "subTray": "이제 Handy가 시스템 트레이에 있습니다. 어떤 앱에서든 <keys/>를 누르거나 탭해서 말하세요.",
+      "subMac": "Prism이 준비되었습니다. 모든 앱에서 단축키를 사용하세요.",
+      "subTray": "Prism이 준비되었습니다. 모든 앱에서 단축키를 사용하세요.",
       "hint": "나중에 설정에서 바꿀 수 있습니다",
       "highFiveLabel": "하이파이브",
       "atLogin": "로그인할 때 Prism 시작",
@@ -453,9 +469,16 @@
         "average": "모든 채널 평균",
         "channel": "채널 {{n}}"
       },
+      "cues": {
+        "start": "시작",
+        "stop": "종료",
+        "cancel": "Esc",
+        "custom": "사용자 지정",
+        "preview": "소리 미리 듣기: {{cue}}"
+      },
       "audioFeedback": {
-        "label": "오디오 피드백",
-        "description": "녹음 시작 및 정지 시 소리 재생"
+        "label": "녹음 소리",
+        "description": "녹음을 시작하거나 끝내거나 취소할 때 소리를 재생합니다."
       },
       "outputDevice": {
         "title": "출력 장치",

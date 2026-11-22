@@ -259,6 +259,7 @@ struct CoordinatorState {
     last_press: Option<Instant>,
     pending_release: Option<PendingRelease>,
     pending_press: Option<PendingPress>,
+    release_grace: Duration,
 }
 
 impl CoordinatorState {
@@ -269,6 +270,7 @@ impl CoordinatorState {
             last_press: None,
             pending_release: None,
             pending_press: None,
+            release_grace: RELEASE_GRACE,
         }
     }
 
@@ -317,9 +319,12 @@ impl CoordinatorState {
                     hold_threshold: input.effective_hold_threshold(),
                     binding_id: input.binding_id,
                     hotkey_string: input.hotkey_string,
-                    deadline: now + RELEASE_GRACE,
+                    deadline: now + self.release_grace,
                     released_at: now,
                 });
+                if self.release_grace.is_zero() {
+                    return self.on_grace_expired();
+                }
                 return None;
             }
             PttAction::Passthrough => {}
@@ -587,6 +592,12 @@ impl TranscriptionCoordinator {
         thread::spawn(move || {
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let mut state = CoordinatorState::new();
+                // X11 synthesizes key-up/key-down pairs during key repeat.
+                // On macOS a genuine release can reach transcription immediately.
+                #[cfg(target_os = "macos")]
+                {
+                    state.release_grace = Duration::ZERO;
+                }
 
                 loop {
                     let cmd = if let Some(deadline) = state.grace_deadline() {
