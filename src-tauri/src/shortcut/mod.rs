@@ -784,6 +784,18 @@ pub fn change_overlay_style_setting(app: AppHandle, style: String) -> Result<(),
 
 #[tauri::command]
 #[specta::specta]
+pub fn change_transcript_animation(
+    app: AppHandle,
+    animation: settings::TranscriptAnimation,
+) -> Result<(), String> {
+    let mut current = settings::get_settings(&app);
+    current.transcript_animation = animation;
+    settings::write_settings(&app, current);
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn change_debug_mode_setting(app: AppHandle, enabled: bool) -> Result<(), String> {
     let mut settings = settings::get_settings(&app);
     settings.debug_mode = enabled;

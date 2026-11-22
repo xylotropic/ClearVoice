@@ -25,8 +25,6 @@
     "dailyWords": "Słowa: {{words}}",
     "less": "Mniej",
     "more": "Więcej",
-    "estimated": "Szacunek",
-    "timeEstimate": "Przy 150 słowach na minutę podczas mówienia i 50 podczas pisania.",
     "unavailable": "Nie udało się wczytać aktywności.",
     "retry": "Spróbuj ponownie"
   },
@@ -533,6 +531,14 @@
         "description": "Wyświetlaj ikonę Prism w zasobniku systemowym."
       },
       "overlay": {
+        "animation": {
+          "title": "Animacja tekstu",
+          "generate": "Stopniowe pojawianie",
+          "encrypted": "Szyfrowanie",
+          "sweep": "Smuga światła",
+          "typewriter": "Maszyna do pisania",
+          "off": "Wył."
+        },
         "style": {
           "title": "Nakładka",
           "description": "Wybierz nakładkę nagrywania: „Brak“ ją ukrywa, „Minimalna“ pokazuje kompaktowy wskaźnik, „Na żywo“ wyświetla transkrypcję w czasie rzeczywistym podczas mówienia (tylko modele obsługujące streaming — poszukaj etykiety „Streaming“ w selektorze modeli). W systemie Linux zalecana jest opcja „Brak“.",

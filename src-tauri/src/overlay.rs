@@ -56,11 +56,17 @@ tauri_panel! {
 #[cfg(not(target_os = "macos"))]
 const OVERLAY_WIDTH: f64 = 266.0;
 #[cfg(target_os = "macos")]
-const OVERLAY_WIDTH: f64 = 350.0;
+const OVERLAY_WIDTH: f64 = 288.0;
+#[cfg(not(target_os = "macos"))]
 const OVERLAY_HEIGHT: f64 = 50.0;
+#[cfg(target_os = "macos")]
+const OVERLAY_HEIGHT: f64 = 90.0;
 
-// Actual is 394x118, just a little extra
+// A few points of slack around the widest live card.
+#[cfg(not(target_os = "macos"))]
 const OVERLAY_STREAM_WIDTH: f64 = 400.0;
+#[cfg(target_os = "macos")]
+const OVERLAY_STREAM_WIDTH: f64 = 344.0;
 const OVERLAY_STREAM_HEIGHT: f64 = 120.0;
 
 const NOTICE_STATE: &str = "notice";
@@ -282,9 +288,9 @@ fn calculate_overlay_position(
     Some((x, y))
 }
 
-/// Center the panel on one NSScreen and position it entirely in that screen's
-/// safe area. AppKit uses the same coordinates for screens and window frames,
-/// including displays with different scaling factors and negative origins.
+/// Position the panel in AppKit's screen coordinates. A built-in camera
+/// cutout gets a flush panel with the outer controls beside it. Displays
+/// without a cutout leave the menu bar untouched.
 #[cfg(target_os = "macos")]
 fn place_macos_overlay(app: &AppHandle, width: f64, height: f64, position: OverlayPosition) {
     use objc2::{sel, MainThreadMarker};
@@ -316,17 +322,43 @@ fn place_macos_overlay(app: &AppHandle, width: f64, height: f64, position: Overl
     let frame = screen.frame();
     let work = screen.visibleFrame();
     let top = frame.origin.y + frame.size.height;
-    let camera = if screen.respondsToSelector(sel!(safeAreaInsets)) {
-        screen.safeAreaInsets().top
+    let (center, camera_width, camera_height) = if position == OverlayPosition::Top
+        && screen.respondsToSelector(sel!(safeAreaInsets))
+        && screen.safeAreaInsets().top > 0.0
+    {
+        let left = screen.auxiliaryTopLeftArea();
+        let right = screen.auxiliaryTopRightArea();
+        let left_edge = left.origin.x + left.size.width;
+        let right_edge = right.origin.x;
+        if left.size.width > 0.0 && right.size.width > 0.0 && right_edge > left_edge {
+            (
+                (left_edge + right_edge) / 2.0,
+                right_edge - left_edge,
+                screen.safeAreaInsets().top,
+            )
+        } else {
+            (frame.origin.x + frame.size.width / 2.0, 0.0, 0.0)
+        }
     } else {
-        0.0
+        (frame.origin.x + frame.size.width / 2.0, 0.0, 0.0)
     };
-    let x = frame.origin.x + (frame.size.width - width) / 2.0;
     let y = match position {
-        OverlayPosition::Top => (top - camera).min(work.origin.y + work.size.height),
+        OverlayPosition::Top if camera_height > 0.0 => top,
+        OverlayPosition::Top => work.origin.y + work.size.height,
         OverlayPosition::Bottom => work.origin.y + height + OVERLAY_BOTTOM_OFFSET,
     };
-    panel.as_panel().setFrameTopLeftPoint(NSPoint::new(x, y));
+    panel
+        .as_panel()
+        .setFrameTopLeftPoint(NSPoint::new(center - width / 2.0, y));
+    let _ = app.emit_to(
+        "recording_overlay",
+        "overlay-display-layout",
+        serde_json::json!({
+            "position": position,
+            "cameraWidth": camera_width,
+            "cameraHeight": camera_height,
+        }),
+    );
 }
 
 /// Current overlay window size in logical units (points), for repositioning
@@ -515,6 +547,48 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
     }
 }
 
+/// AppKit normally moves visible windows below the menu bar, even when given
+/// a top-edge frame. This panel calculates its own safe placement, so it
+/// overrides the frame constraint on its own subclass.
+#[cfg(target_os = "macos")]
+fn allow_overlay_in_menu_bar(panel: &objc2_app_kit::NSPanel) {
+    use objc2::runtime::{AnyClass, AnyObject, ClassBuilder, Sel};
+    use objc2::sel;
+    use objc2_app_kit::NSScreen;
+    use objc2_foundation::NSRect;
+    use std::sync::OnceLock;
+
+    extern "C-unwind" fn constrain_frame(
+        _panel: &AnyObject,
+        _selector: Sel,
+        frame: NSRect,
+        _screen: Option<&NSScreen>,
+    ) -> NSRect {
+        frame
+    }
+
+    static CLASS: OnceLock<&'static AnyClass> = OnceLock::new();
+    let object: &AnyObject = panel;
+    let superclass = object.class();
+    let subclass = CLASS.get_or_init(|| {
+        let mut class = ClassBuilder::new(c"PrismMenuBarRecordingPanel", superclass)
+            .expect("register Prism recording panel subclass");
+        // SAFETY: This matches NSWindow's constrainFrameRect:toScreen: signature.
+        unsafe {
+            class.add_method(
+                sel!(constrainFrameRect:toScreen:),
+                constrain_frame as extern "C-unwind" fn(_, _, _, _) -> _,
+            );
+        }
+        class.register()
+    });
+    if subclass.superclass() == Some(superclass) {
+        // SAFETY: The subclass has no added ivars and keeps the parent panel's ABI.
+        // The panel is created and configured on the macOS main thread.
+        unsafe { AnyObject::set_class(object, subclass) };
+    }
+}
+
 /// Creates the recording overlay panel and keeps it hidden by default (macOS)
 #[cfg(target_os = "macos")]
 pub fn create_recording_overlay(app_handle: &AppHandle) {
@@ -545,6 +619,7 @@ pub fn create_recording_overlay(app_handle: &AppHandle) {
         .build()
     {
         Ok(panel) => {
+            allow_overlay_in_menu_bar(panel.as_panel());
             panel.hide();
         }
         Err(e) => {

@@ -3,7 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Dropdown } from "../ui/Dropdown";
 import { SettingContainer } from "../ui/SettingContainer";
 import { useSettings } from "../../hooks/useSettings";
-import type { OverlayPosition, OverlayStyle } from "@/bindings";
+import type {
+  OverlayPosition,
+  OverlayStyle,
+  TranscriptAnimation,
+} from "@/bindings";
 
 interface ShowOverlayProps {
   descriptionMode?: "inline" | "tooltip";
@@ -29,6 +33,18 @@ export const ShowOverlay: React.FC<ShowOverlayProps> = React.memo(
         label: t("settings.advanced.overlay.style.options.live"),
       },
     ];
+
+    const animationOptions = (
+      [
+        "encrypted",
+        "sweep",
+        "typewriter",
+        "off",
+      ] satisfies TranscriptAnimation[]
+    ).map((value) => ({
+      value,
+      label: t(`settings.advanced.overlay.animation.${value}`),
+    }));
 
     const positionOptions = [
       {
@@ -65,6 +81,26 @@ export const ShowOverlay: React.FC<ShowOverlayProps> = React.memo(
             disabled={isUpdating("overlay_style")}
           />
         </SettingContainer>
+
+        {selectedStyle === "live" && (
+          <SettingContainer
+            title={t("settings.advanced.overlay.animation.title")}
+            descriptionMode={descriptionMode}
+            grouped={grouped}
+          >
+            <Dropdown
+              options={animationOptions}
+              selectedValue={getSetting("transcript_animation") ?? "generate"}
+              onSelect={(value) =>
+                updateSetting(
+                  "transcript_animation",
+                  value as TranscriptAnimation,
+                )
+              }
+              disabled={isUpdating("transcript_animation")}
+            />
+          </SettingContainer>
+        )}
 
         {selectedStyle !== "none" && (
           <SettingContainer

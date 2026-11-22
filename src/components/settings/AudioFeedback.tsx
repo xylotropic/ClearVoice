@@ -59,8 +59,8 @@ export const AudioFeedback: React.FC<AudioFeedbackProps> = React.memo(
                         })
                       }
                     >
-                      <option value="marimba">Marimba</option>
-                      <option value="pop">Pop</option>
+                      <option value="marimba">Soft Plop</option>
+                      <option value="pop">Tap</option>
                       {(theme === "custom" || selected === "custom") && (
                         <option value="custom">
                           {t("settings.sound.cues.custom")}

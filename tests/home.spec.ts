@@ -15,6 +15,12 @@ test("home is the default and reads local activity with keyboard-accessible days
       body:
         `import { mockIPC, mockWindows } from "/node_modules/@tauri-apps/api/mocks.js";
 mockWindows("main");
+let wordsToday = 90;
+window.recordUnsavedDictation = async () => {
+  wordsToday += 4;
+  const { emit } = await import("/node_modules/@tauri-apps/api/event.js");
+  await emit("activity-updated");
+};
 mockIPC((cmd) => {
   if (cmd === "get_app_settings") {
     return { app_language: "en", theme: "light", onboarding_completed: true, show_whats_new_on_update: false };
@@ -23,8 +29,8 @@ mockIPC((cmd) => {
   if (cmd === "get_secure_input_status") return { sustained: false };
   if (cmd === "get_retired_models" || cmd.startsWith("get_available") || cmd === "get_active_notices") return [];
   if (cmd === "get_activity_summary") return {
-    today: "2026-11-21", words_today: 90, words_total: 59025, transcriptions: 432,
-    streak: 3, days: [{ date: "2026-11-21", words: 90 }, { date: "2026-11-20", words: 820 }],
+    today: "2026-11-21", words_today: wordsToday, words_total: 59025 + wordsToday - 90, transcriptions: wordsToday === 90 ? 432 : 433,
+    streak: 3, days: [{ date: "2026-11-21", words: wordsToday }, { date: "2026-11-20", words: 820 }],
   };
 }, { shouldMockEvents: true });
 ` + (await response.text()),
@@ -40,6 +46,7 @@ mockIPC((cmd) => {
   await expect(page.locator(".prism-stat-transcriptions dd")).toHaveText("432");
   await expect(page.locator(".prism-stat-streak dd")).toHaveText("3 days");
   await expect(page.locator(".prism-stat-timeSaved dd")).toHaveText("13.12 hr");
+  await expect(page.getByText("Estimate", { exact: true })).toHaveCount(0);
   const today = page.getByRole("button", { name: /November 21.*90/ });
   const yesterday = page.getByRole("button", { name: /November 20.*820/ });
   await expect(today).toHaveAttribute("data-level", "1");
@@ -49,4 +56,11 @@ mockIPC((cmd) => {
   await expect(yesterday).toBeFocused();
   await expect(page.locator(".prism-activity-detail")).toContainText("820");
   await expect(page.getByText("Update Checking Disabled")).toHaveCount(0);
+  await page.evaluate(() =>
+    (
+      window as Window & { recordUnsavedDictation: () => Promise<void> }
+    ).recordUnsavedDictation(),
+  );
+  await expect(page.locator(".prism-stat-wordsToday dd")).toHaveText("94");
+  await expect(page.locator(".prism-stat-transcriptions dd")).toHaveText("433");
 });

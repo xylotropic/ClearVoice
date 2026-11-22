@@ -25,8 +25,6 @@
     "dailyWords": "Mots : {{words}}",
     "less": "Moins",
     "more": "Plus",
-    "estimated": "Estimation",
-    "timeEstimate": "À raison de 150 mots/min à l’oral et 50 au clavier.",
     "unavailable": "Impossible de charger l’activité.",
     "retry": "Réessayer"
   },
@@ -533,6 +531,14 @@
         "description": "Afficher l'icône de Prism dans la barre système."
       },
       "overlay": {
+        "animation": {
+          "title": "Animation du texte",
+          "generate": "Apparition progressive",
+          "encrypted": "Chiffré",
+          "sweep": "Balayage",
+          "typewriter": "Machine à écrire",
+          "off": "Désactivée"
+        },
         "style": {
           "title": "Overlay",
           "description": "Choisissez l'overlay d'enregistrement : « Aucun » le masque, « Minimal » affiche une pilule compacte, « Live » affiche la transcription en temps réel pendant que vous parlez (uniquement pour les modèles compatibles avec le streaming — recherchez le badge Streaming dans le sélecteur de modèle). Sur Linux, « Aucun » est recommandé.",

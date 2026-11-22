@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use std::fs;
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Emitter};
 use tauri_specta::Event;
 use unicode_segmentation::UnicodeSegmentation;
 
@@ -341,6 +341,16 @@ impl HistoryManager {
             language: None,
             language_source: None,
         })
+    }
+
+    /// Count completed dictation when its recording and transcript aren't retained.
+    pub fn record_unsaved_dictation(&self, text: &str) -> Result<()> {
+        let conn = self.get_connection()?;
+        activity::record(&conn, Utc::now().timestamp(), text, true)?;
+        if let Err(err) = self.app_handle.emit_to("main", "activity-updated", ()) {
+            warn!("Failed to emit activity update: {err}");
+        }
+        Ok(())
     }
 
     /// Insert `entry`, filling in its id and title, and announce it.

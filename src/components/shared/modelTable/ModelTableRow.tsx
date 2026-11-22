@@ -32,6 +32,8 @@ interface ModelTableRowProps {
   download?: RowDownload | null;
   /** Second line; takes precedence over download progress and description. */
   line?: React.ReactNode;
+  /** Hide descriptions and recommendation badges in the main model list. */
+  compact?: boolean;
   /** Delete/stop button (Models page). */
   slot?: React.ReactNode;
   /** Replaces the columns and slot (the delete confirmation). */
@@ -55,6 +57,7 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
   mark,
   download,
   line,
+  compact = false,
   slot,
   tail,
   onActivate,
@@ -122,7 +125,7 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
       t("modelTable.customLine")
     ) : entry.kind === "legacy" ? (
       t("modelTable.legacyLine")
-    ) : (
+    ) : compact ? null : (
       entry.description
     ));
 
@@ -145,7 +148,7 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
         }
       }}
       title={hint}
-      className={`group relative ${rowGrid(actions)} min-h-[50px] w-full min-w-0 flex-none rounded-control px-[14px] py-[9px] text-start text-small leading-[1.5] text-text focus:outline-none focus-visible:ring-1 focus-visible:ring-logo-primary ${vt ? "[view-transition-class:mf-row_mf-box]" : ""} ${
+      className={`group relative ${rowGrid(actions)} ${compact && !shownLine ? "min-h-[41px]" : "min-h-[50px]"} w-full min-w-0 flex-none rounded-control px-[14px] py-[9px] text-start text-small leading-[1.5] text-text focus:outline-none focus-visible:ring-1 focus-visible:ring-logo-primary ${vt ? "[view-transition-class:mf-row_mf-box]" : ""} ${
         tail
           ? "bg-wash"
           : selected
@@ -164,13 +167,17 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
         <span className="flex min-w-0 max-w-full items-center gap-[6px]">
           <b
             {...vt?.("n")}
-            title={entry.name}
+            title={
+              compact && entry.description
+                ? `${entry.name} — ${entry.description}`
+                : entry.name
+            }
             className={`min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-[650] ${dim ? "opacity-60" : ""}`}
           >
             {entry.name}
           </b>
           {/* The delete question needs the room. */}
-          {role && !tail && (
+          {role && !tail && !compact && (
             <Tag {...vt?.("r")}>{t(`modelTable.roles.${ROLE_KEYS[role]}`)}</Tag>
           )}
           {entry.kind === "custom" && <Tag>{t("modelSelector.custom")}</Tag>}
@@ -188,13 +195,15 @@ export const ModelTableRow: React.FC<ModelTableRowProps> = ({
             </span>
           )}
         </span>
-        <span
-          {...vt?.("d")}
-          title={typeof shownLine === "string" ? shownLine : undefined}
-          className={`max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-ink-3 ${dim ? "opacity-60" : ""}`}
-        >
-          {shownLine}
-        </span>
+        {shownLine && (
+          <span
+            {...vt?.("d")}
+            title={typeof shownLine === "string" ? shownLine : undefined}
+            className={`max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-ink-3 ${dim ? "opacity-60" : ""}`}
+          >
+            {shownLine}
+          </span>
+        )}
       </span>
       {tail ?? (
         <Values

@@ -861,7 +861,7 @@ impl ShortcutAction for TranscribeAction {
                                 return;
                             }
 
-                            // Save to history if WAV was saved
+                            // Keep usage totals even when recording retention is off.
                             if wav_saved {
                                 if let Err(err) = hm.save_entry(
                                     file_name,
@@ -873,6 +873,8 @@ impl ShortcutAction for TranscribeAction {
                                 ) {
                                     error!("Failed to save history entry: {}", err);
                                 }
+                            } else if let Err(err) = hm.record_unsaved_dictation(&transcription) {
+                                error!("Failed to count dictation: {err}");
                             }
 
                             // The user's hook only changes what gets pasted;

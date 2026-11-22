@@ -11,6 +11,7 @@ import type {
   VadBackend,
   LanguageDetectionMode,
   RecordingSounds,
+  TranscriptAnimation,
 } from "@/bindings";
 import { commands } from "@/bindings";
 import { notify } from "@/stores/noticeStore";
@@ -190,6 +191,8 @@ const settingUpdaters: {
     }
   },
   overlay_style: (value) => commands.changeOverlayStyleSetting(value as string),
+  transcript_animation: (value) =>
+    commands.changeTranscriptAnimation(value as TranscriptAnimation),
   vad_enabled: (value) => commands.changeVadEnabledSetting(value as boolean),
   long_form_chunking: (value) =>
     commands.changeLongFormChunkingSetting(value as boolean),

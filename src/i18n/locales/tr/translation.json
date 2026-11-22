@@ -25,8 +25,6 @@
     "dailyWords": "Kelime: {{words}}",
     "less": "Az",
     "more": "Çok",
-    "estimated": "Tahmin",
-    "timeEstimate": "Konuşma dakikada 150, yazma dakikada 50 kelime olarak hesaplanır.",
     "unavailable": "Etkinlik yüklenemedi.",
     "retry": "Tekrar dene"
   },
@@ -533,6 +531,14 @@
         "description": "Prism simgesini sistem tepsisinde göster."
       },
       "overlay": {
+        "animation": {
+          "title": "Metin animasyonu",
+          "generate": "Kademeli görünme",
+          "encrypted": "Şifreli",
+          "sweep": "Işık dalgası",
+          "typewriter": "Daktilo",
+          "off": "Kapalı"
+        },
         "style": {
           "title": "Ekran Katmanı",
           "description": "Kayıt sırasında gösterilecek ekran katmanını seçin: 'Yok' katmanı gizler, 'Sade' küçük bir gösterge gösterir, 'Canlı' siz konuşurken transkripsiyonu gerçek zamanlı gösterir (yalnızca akış destekli modeller — model seçicide 'Akış' rozetini arayın). Linux'ta 'Yok' önerilir.",

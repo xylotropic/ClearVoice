@@ -25,8 +25,6 @@
     "dailyWords": "Ord: {{words}}",
     "less": "Mindre",
     "more": "Mer",
-    "estimated": "Uppskattning",
-    "timeEstimate": "Vid 150 talade och 50 skrivna ord per minut.",
     "unavailable": "Aktiviteten kunde inte läsas in.",
     "retry": "Försök igen"
   },
@@ -533,6 +531,14 @@
         "description": "Visa Prism-ikonen i systemfältet."
       },
       "overlay": {
+        "animation": {
+          "title": "Textanimation",
+          "generate": "Gradvis framtoning",
+          "encrypted": "Krypterad",
+          "sweep": "Ljusstråk",
+          "typewriter": "Skrivmaskin",
+          "off": "Av"
+        },
         "style": {
           "title": "Overlay",
           "description": "Välj inspelningsöverlägget: ”Ingen” döljer det, ”Minimal” visar en kompakt indikator, ”Live” visar transkriberingen i realtid medan du talar (endast modeller med streamingstöd — leta efter Streaming-märket i modellväljaren). På Linux rekommenderas ”Ingen”.",

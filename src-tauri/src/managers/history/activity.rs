@@ -165,6 +165,33 @@ mod tests {
     }
 
     #[test]
+    fn can_count_dictation_with_no_history_entries() {
+        let mut conn = Connection::open_in_memory().unwrap();
+        conn.execute_batch(
+            "CREATE TABLE transcription_history (
+                timestamp INTEGER NOT NULL,
+                transcription_text TEXT NOT NULL,
+                source_name TEXT
+            );",
+        )
+        .unwrap();
+        let now = Local::now();
+        initialize(&mut conn).unwrap();
+        record(&conn, now.timestamp(), "Four words spoken here.", true).unwrap();
+        record(&conn, now.timestamp(), "   ", true).unwrap();
+        let totals = summary(&conn, now.date_naive()).unwrap();
+        assert_eq!(totals.words_today, 4);
+        assert_eq!(totals.transcriptions, 1);
+        assert_eq!(totals.streak, 1);
+        let history_count: u64 = conn
+            .query_row("SELECT COUNT(*) FROM transcription_history", [], |row| {
+                row.get(0)
+            })
+            .unwrap();
+        assert_eq!(history_count, 0);
+    }
+
+    #[test]
     fn yesterday_counts_toward_the_streak_and_an_older_gap_breaks_it() {
         let conn = Connection::open_in_memory().unwrap();
         conn.execute_batch(

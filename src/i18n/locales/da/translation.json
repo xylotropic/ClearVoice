@@ -25,8 +25,6 @@
     "dailyWords": "Ord: {{words}}",
     "less": "Mindre",
     "more": "Mere",
-    "estimated": "Estimat",
-    "timeEstimate": "Ved 150 talte og 50 tastede ord pr. minut.",
     "unavailable": "Aktivitet kunne ikke indlæses.",
     "retry": "Prøv igen"
   },
@@ -533,6 +531,14 @@
         "description": "Vis Prism-ikonet i meddelelsesområdet."
       },
       "overlay": {
+        "animation": {
+          "title": "Tekstanimation",
+          "generate": "Gradvis fremtoning",
+          "encrypted": "Krypteret",
+          "sweep": "Lysstrøg",
+          "typewriter": "Skrivemaskine",
+          "off": "Fra"
+        },
         "style": {
           "title": "Overlay",
           "description": "Vælg optagelses-overlay: Ingen skjuler det, Minimal viser en kompakt pille, Live viser transskription i realtid, mens du taler (kun modeller med streaming-understøttelse — se efter Streaming-mærket i modelvælgeren). På Linux anbefales 'Ingen'.",

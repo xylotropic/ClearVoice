@@ -174,6 +174,7 @@ export const ModelRow: React.FC<{ entry: Entry }> = ({ entry }) => {
       mark={mark}
       download={download}
       line={line}
+      compact
       slot={slot}
       tail={ask || undefined}
       inert={inert}

@@ -25,8 +25,6 @@
     "dailyWords": "Wörter: {{words}}",
     "less": "Weniger",
     "more": "Mehr",
-    "estimated": "Schätzung",
-    "timeEstimate": "Bei 150 Wörtern pro Minute beim Sprechen und 50 beim Tippen.",
     "unavailable": "Die Aktivität konnte nicht geladen werden.",
     "retry": "Erneut versuchen"
   },
@@ -533,6 +531,14 @@
         "description": "Das Prism-Symbol in der Taskleiste anzeigen."
       },
       "overlay": {
+        "animation": {
+          "title": "Textanimation",
+          "generate": "Sanftes Einblenden",
+          "encrypted": "Verschlüsselt",
+          "sweep": "Lichtlauf",
+          "typewriter": "Schreibmaschine",
+          "off": "Aus"
+        },
         "style": {
           "title": "Overlay",
           "description": "Wähle das Aufnahme-Overlay: „Keine“ blendet es aus, „Minimal“ zeigt ein kompaktes Element, „Live“ zeigt die Transkription in Echtzeit während des Sprechens an (nur für streamingfähige Modelle – suche nach dem Streaming-Badge in der Modellauswahl). Unter Linux wird „Keine“ empfohlen.",

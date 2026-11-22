@@ -25,8 +25,6 @@
     "dailyWords": "Parole: {{words}}",
     "less": "Meno",
     "more": "Più",
-    "estimated": "Stima",
-    "timeEstimate": "Con 150 parole/min parlando e 50 digitando.",
     "unavailable": "Impossibile caricare l’attività.",
     "retry": "Riprova"
   },
@@ -533,6 +531,14 @@
         "description": "Mostra l'icona di Prism nella barra di sistema."
       },
       "overlay": {
+        "animation": {
+          "title": "Animazione del testo",
+          "generate": "Comparsa graduale",
+          "encrypted": "Cifrato",
+          "sweep": "Scia luminosa",
+          "typewriter": "Macchina da scrivere",
+          "off": "Disattivata"
+        },
         "style": {
           "title": "Overlay",
           "description": "Scegli l'overlay di registrazione: 'Nessuno' lo nasconde, 'Minimo' mostra una barra compatta, 'In tempo reale' mostra la trascrizione in tempo reale mentre parli (solo per modelli che supportano lo streaming — cerca il badge 'Streaming' nel selettore del modello). Su Linux si raccomanda l'opzione 'Nessuno'.",

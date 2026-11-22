@@ -25,8 +25,6 @@
     "dailyWords": "Slova: {{words}}",
     "less": "Méně",
     "more": "Více",
-    "estimated": "Odhad",
-    "timeEstimate": "Při 150 slovech za minutu mluvení a 50 při psaní.",
     "unavailable": "Aktivitu se nepodařilo načíst.",
     "retry": "Zkusit znovu"
   },
@@ -533,6 +531,14 @@
         "description": "Zobrazit ikonu Prism v systémové liště."
       },
       "overlay": {
+        "animation": {
+          "title": "Animace textu",
+          "generate": "Postupné odhalení",
+          "encrypted": "Šifrovaná",
+          "sweep": "Záblesk",
+          "typewriter": "Psací stroj",
+          "off": "Vypnuto"
+        },
         "style": {
           "title": "Překryv",
           "description": "Vyberte překryv při nahrávání: „Žádné“ jej skryje, „Minimální“ zobrazí kompaktní indikátor, „Živě“ zobrazuje přepis v reálném čase, když mluvíte (pouze modely podporující streaming — hledejte odznak „Streaming“ ve výběru modelů). Na Linuxu se doporučuje „Žádné“.",

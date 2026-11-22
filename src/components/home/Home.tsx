@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
 import { AudioLines, Clock3, Flame, Layers2, Mic } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { isRTLLanguage } from "@/lib/utils/rtl";
@@ -163,10 +164,11 @@ export function Home() {
 
   useEffect(() => {
     void refresh();
-    const listen = events.historyUpdatePayload.listen(({ payload }) => {
+    const stopHistory = events.historyUpdatePayload.listen(({ payload }) => {
       if (payload.action === "added" || payload.action === "updated")
         void refresh();
     });
+    const stopUsage = listen("activity-updated", refresh);
     window.addEventListener("focus", refresh);
     // Refresh at midnight even if the window stays open.
     let midnight: number;
@@ -183,10 +185,12 @@ export function Home() {
       ++request.current;
       window.removeEventListener("focus", refresh);
       window.clearTimeout(midnight);
-      void listen.then(
-        (stop) => stop(),
-        () => {},
-      );
+      for (const listener of [stopHistory, stopUsage]) {
+        void listener.then(
+          (stop) => stop(),
+          () => {},
+        );
+      }
     };
   }, [refresh]);
 
@@ -235,16 +239,6 @@ export function Home() {
               {t(`home.${label}`)}
             </dt>
             <dd>{value ?? "—"}</dd>
-            {label === "timeSaved" && (
-              <span
-                className="prism-stat-detail"
-                tabIndex={0}
-                aria-label={t("home.timeEstimate")}
-                title={t("home.timeEstimate")}
-              >
-                {t("home.estimated")}
-              </span>
-            )}
           </div>
         ))}
       </dl>

@@ -25,8 +25,6 @@
     "dailyWords": "Palabras: {{words}}",
     "less": "Menos",
     "more": "Más",
-    "estimated": "Estimación",
-    "timeEstimate": "Con 150 palabras/min al hablar y 50 al escribir.",
     "unavailable": "No se pudo cargar la actividad.",
     "retry": "Reintentar"
   },
@@ -533,6 +531,14 @@
         "description": "Mostrar el icono de Prism en la bandeja del sistema."
       },
       "overlay": {
+        "animation": {
+          "title": "Animación del texto",
+          "generate": "Aparición gradual",
+          "encrypted": "Cifrado",
+          "sweep": "Destello",
+          "typewriter": "Máquina de escribir",
+          "off": "Desactivada"
+        },
         "style": {
           "title": "Superposición",
           "description": "Elige la superposición de grabación: Ninguna la oculta, Minimalista muestra una píldora compacta, En vivo muestra la transcripción en tiempo real mientras hablas (solo modelos compatibles con streaming — busca la insignia Streaming en el selector de modelos). En Linux se recomienda 'Ninguna'.",

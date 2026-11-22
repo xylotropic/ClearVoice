@@ -25,8 +25,6 @@
     "dailyWords": "字词数：{{words}}",
     "less": "少",
     "more": "多",
-    "estimated": "估算",
-    "timeEstimate": "按每分钟口述 150 词、键入 50 词估算。",
     "unavailable": "无法加载活动。",
     "retry": "重试"
   },
@@ -533,6 +531,14 @@
         "description": "在系统托盘中显示 Prism 图标。"
       },
       "overlay": {
+        "animation": {
+          "title": "文字动画",
+          "generate": "文字渐显",
+          "encrypted": "加密",
+          "sweep": "扫光",
+          "typewriter": "打字机",
+          "off": "关闭"
+        },
         "style": {
           "title": "悬浮窗",
           "description": "选择录音悬浮窗的样式：「无」会隐藏悬浮窗，「精简」显示小巧的胶囊状指示，「实时」在您说话时实时显示转录内容（仅限支持流式的模型——请在模型选择器中查找「流式」标签）。在 Linux 上建议选择「无」。",

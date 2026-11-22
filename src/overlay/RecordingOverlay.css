@@ -256,33 +256,170 @@
   color: var(--s-muted);
 }
 .transcript-word {
-  border-radius: 3px;
-  background: linear-gradient(
-      90deg,
-      transparent 20%,
-      #218fff55 50%,
-      transparent 85%
-    )
-    no-repeat 100% 50% / 245% 100%;
-  animation: transcript-arrive 340ms cubic-bezier(0.18, 0.55, 0.25, 1) both;
-  transition: color 150ms ease-out;
+  position: relative;
+  transition: color 140ms ease-out;
 }
 
-@keyframes transcript-arrive {
-  0% {
-    background-position: 100% 50%;
-    text-shadow: 0 0 7px #49a3ffae;
+[data-animation="generate"] .transcript-glyphs {
+  display: inline-block;
+  max-width: 100%;
+  animation: transcript-generate 220ms cubic-bezier(0.21, 0.6, 0.35, 1) both;
+}
+@keyframes transcript-generate {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    text-shadow: 0 0 8px #378bff;
   }
-  100% {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    text-shadow: none;
+  }
+}
+
+[data-animation="sweep"] .transcript-word {
+  border-radius: 3px;
+  background: linear-gradient(
+      102deg,
+      transparent 14%,
+      #204bff50 31%,
+      #2196ffc4 48%,
+      #87e1ffad 57%,
+      transparent 83%
+    )
+    no-repeat 100% 50% / 245% 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  animation: transcript-sweep 460ms cubic-bezier(0.18, 0.55, 0.25, 1) both;
+}
+
+@keyframes transcript-sweep {
+  from {
+    background-position: 100% 50%;
+    text-shadow: 0 0 8px #52b8ffc4;
+  }
+  to {
     background-position: 0 50%;
     text-shadow: none;
   }
 }
 
+:is([data-animation="encrypted"], [data-animation="typewriter"])
+  .transcript-word {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: baseline;
+}
+
+[data-animation="encrypted"] .transcript-glyphs {
+  display: block;
+  animation: transcript-decode 240ms ease-out both;
+}
+
+.transcript-cipher {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  overflow: hidden;
+  color: #6bd0ff;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.86em;
+  text-shadow:
+    0 0 7px #188cff,
+    0 0 13px #0769ed;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  animation: cipher-dissolve 240ms ease-out both;
+}
+.transcript-cipher::before {
+  content: attr(data-first);
+  animation: cipher-flicker 100ms steps(1, end) both;
+}
+.transcript-cipher::after {
+  content: attr(data-second);
+  position: absolute;
+  inset: 0;
+  animation: cipher-flicker 100ms steps(1, end) reverse both;
+}
+
+@keyframes cipher-flicker {
+  0%,
+  66% {
+    opacity: 1;
+  }
+  33%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes cipher-dissolve {
+  0%,
+  21% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes transcript-decode {
+  0%,
+  21% {
+    color: transparent;
+    clip-path: inset(0 100% 0 0);
+  }
+  63% {
+    text-shadow: 0 0 8px #44b8fff0;
+  }
+  100% {
+    clip-path: inset(0);
+  }
+}
+[data-animation="typewriter"] .transcript-glyphs {
+  display: block;
+  animation: transcript-type 180ms steps(5, end) both;
+}
+@keyframes transcript-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+[dir="rtl"][data-animation="encrypted"] .transcript-glyphs {
+  animation-name: transcript-decode-rtl;
+}
+[dir="rtl"][data-animation="typewriter"] .transcript-glyphs {
+  animation-name: transcript-type-rtl;
+}
+@keyframes transcript-decode-rtl {
+  0%,
+  21% {
+    color: transparent;
+    clip-path: inset(0 0 0 100%);
+  }
+  63% {
+    text-shadow: 0 0 8px #44b8fff0;
+  }
+  100% {
+    clip-path: inset(0);
+  }
+}
+@keyframes transcript-type-rtl {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
 .ov-stage.docked {
-  --ov-rest-w: 298px;
-  --ov-pill-w: 310px;
-  --ov-work-w: 342px;
+  --ov-rest-w: 246px;
+  --ov-pill-w: 254px;
+  --ov-work-w: 278px;
   --ov-base-h: 43px;
   --s-accent: #66c3ff;
   --s-muted: #acbdd1;
@@ -290,6 +427,7 @@
 }
 
 .ov-stage.mac-notch {
+  --ov-open-w: 332px;
   --s-surface: #000;
   --s-border: #272727;
   --s-muted: #bfc5ce;
@@ -306,37 +444,6 @@
 .ov-stage.mac-notch .snotice .nlabel {
   color: #f3f8ff;
 }
-.ov-stage.mac-notch .transcript-word {
-  background-image: linear-gradient(
-    102deg,
-    transparent 13%,
-    #1969ff60 26%,
-    #1e89ffd0 45%,
-    #54c9ffa0 57%,
-    #1253f433 68%,
-    transparent 82%
-  );
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  animation-name: spectral-word;
-  animation-duration: 520ms;
-}
-@keyframes spectral-word {
-  0% {
-    background-position: 100% 50%;
-    color: #fff;
-    text-shadow:
-      0 0 5px #69cbff,
-      0 0 13px #2587ff;
-  }
-  60% {
-    text-shadow: 0 0 7px #278dffb0;
-  }
-  100% {
-    background-position: 0 50%;
-    text-shadow: none;
-  }
-}
 .ov-stage.mac-notch .swave.ready {
   height: 30px;
   gap: 4px;
@@ -347,11 +454,8 @@
   background: linear-gradient(#dcfcff, #4ac7ff 51%, #3166fd);
   box-shadow: 0 0 7px #318affab;
 }
-.ov-stage.mac-notch .smark.ready {
-  filter: brightness(1.33) drop-shadow(0 0 6px #2496ff92);
-}
-.ov-stage.mac-notch [data-speaking] .smark.ready {
-  filter: brightness(1.52) drop-shadow(0 0 9px #33baffc0);
+.ov-stage.mac-notch [data-speaking] .swave.ready i {
+  box-shadow: 0 0 10px #42a9ffdc;
 }
 .ov-stage.docked .scard {
   border-top: 0;
@@ -415,6 +519,59 @@
   --s-accent: #83c5ff;
 }
 
+.ov-stage.attached {
+  --ov-base-h: max(36px, var(--camera-height));
+  --ov-rest-w: max(246px, calc(var(--camera-width) + 104px));
+  --ov-pill-w: max(254px, calc(var(--camera-width) + 104px));
+}
+.ov-stage.attached .scard {
+  animation: none;
+  border-radius: 0 0 16px 16px;
+}
+.ov-stage.attached .sbase {
+  box-sizing: border-box;
+  position: relative;
+}
+.ov-stage.attached .scard:has(> .sbase:not(.listening)),
+.ov-stage.attached.below-camera .scard {
+  --ov-base-h: calc(var(--camera-height) + 36px);
+}
+.ov-stage.attached .scard > .sbase:not(.listening),
+.ov-stage.attached.below-camera .scard > .sbase {
+  align-items: center;
+  padding-top: var(--camera-height);
+  padding-bottom: 0;
+}
+.ov-stage.attached:not(.below-camera) .sbase.listening {
+  grid-template-columns: auto 1fr auto;
+  padding-inline: 11px;
+}
+.ov-stage.attached:not(.below-camera) .listening .swave {
+  gap: 3px;
+}
+.ov-stage.attached .swave.ready i {
+  max-height: 22px;
+}
+.ov-stage.attached:not(.below-camera) .listening .sbase-r {
+  position: absolute;
+  inset-inline-end: 11px;
+  top: 0;
+  height: 100%;
+}
+.ov-stage.attached:not(.below-camera) .listening .stimer {
+  display: none;
+}
+.ov-stage.attached:not(.below-camera)
+  .scard:is(:hover, :focus-within)
+  .listening
+  .swave {
+  opacity: 0;
+}
+.ov-stage.attached.below-camera {
+  --ov-rest-w: 246px;
+  --ov-pill-w: 254px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ov-stage,
   .ov-stage * {
@@ -473,18 +630,7 @@
   display: block;
   flex: none;
   object-fit: contain;
-  transition:
-    opacity 160ms ease,
-    filter 200ms ease;
 }
-.smark.ready {
-  opacity: 1;
-  filter: drop-shadow(0 0 5px #3199ff77);
-}
-.smark.arming {
-  opacity: 0.56;
-}
-
 .stimer {
   font-size: 12px;
   color: var(--s-faint);

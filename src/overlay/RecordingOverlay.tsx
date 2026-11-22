@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
 import { LiveTranscript } from "./LiveTranscript";
 import prismMark from "@/assets/prism-mark.webp";
-import prismNotch from "@/assets/prism-notch.webp";
 import { commands, events } from "@/bindings";
 import type {
   Notice,
@@ -12,6 +11,7 @@ import type {
   StreamPhaseEvent,
   StreamTextEvent,
   StreamWorkKind,
+  TranscriptAnimation,
 } from "@/bindings";
 import { NoticeBadgeIcon } from "@/components/icons/NoticeBadgeIcon";
 import i18n, { syncLanguageFromSettings } from "@/i18n";
@@ -33,7 +33,7 @@ const isNoticeState = (state: OverlayState) =>
 // Number of reactive bars in the waveform (the simple, smoothed style shared by
 // every overlay form). Mic levels arrive as 16 FFT buckets; we take the first N.
 const IS_MAC = navigator.userAgent.includes("Macintosh");
-const WAVE_BARS = IS_MAC ? 13 : 9;
+const WAVE_BARS = IS_MAC ? 7 : 9;
 
 // Only call out a model load in the Live preview once it has run this long.
 // Warm loads finish in well under this (~0.2s on Apple Silicon, ~1.5s on a
@@ -47,6 +47,15 @@ const OVERLAY_FADE_MS = 300;
 // 13px padding on each side, the 16px badge and its 7px gap.
 const NOTICE_PILL_CHROME = 49;
 
+// Each side needs 48pt for the waveform and its edge padding.
+const MAX_CAMERA_WIDTH_FOR_WINGS = 180;
+
+interface OverlayDisplayLayout {
+  position: "top" | "bottom";
+  cameraWidth: number;
+  cameraHeight: number;
+}
+
 const RecordingOverlay: React.FC = () => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
@@ -55,6 +64,7 @@ const RecordingOverlay: React.FC = () => {
   // Stay visually in an arming state until the backend processes the first
   // actual microphone sample chunk.
   const [captureReady, setCaptureReady] = useState(false);
+  const [animation, setAnimation] = useState<TranscriptAnimation>("generate");
   // Recording starts while the model loads in the background. Say so, otherwise
   // a cold start looks like an empty Live preview that ignores speech, then a
   // hung "Transcribing..." spinner. Once recording stops, any in-flight load is
@@ -82,6 +92,7 @@ const RecordingOverlay: React.FC = () => {
   const [position, setPosition] = useState<"top" | "bottom">(
     IS_MAC ? "top" : "bottom",
   );
+  const [displayLayout, setDisplayLayout] = useState<OverlayDisplayLayout>();
   // True once live text overflows the cap. A top overlay fades its top edge only
   // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
@@ -105,6 +116,14 @@ const RecordingOverlay: React.FC = () => {
         clearTimeout(fadeTimerRef.current);
         setNotice(event.payload);
       });
+
+      const unlistenLayout = await listen<OverlayDisplayLayout>(
+        "overlay-display-layout",
+        ({ payload }) => {
+          setDisplayLayout(payload);
+          setPosition(payload.position);
+        },
+      );
 
       const unlistenShow = await listen("show-overlay", async (event) => {
         const overlayState = event.payload as OverlayState;
@@ -137,6 +156,7 @@ const RecordingOverlay: React.FC = () => {
         try {
           const settings = await commands.getAppSettings();
           if (settings.status === "ok") {
+            setAnimation(settings.data.transcript_animation ?? "generate");
             setPosition(
               settings.data.overlay_position === "top" ? "top" : "bottom",
             );
@@ -220,6 +240,7 @@ const RecordingOverlay: React.FC = () => {
 
       return () => {
         unlistenNotice();
+        unlistenLayout();
         unlistenShow();
         unlistenHide();
         unlistenPaste();
@@ -284,7 +305,27 @@ const RecordingOverlay: React.FC = () => {
 
   if (!isVisible && !shownNotice) return null;
 
-  const stageClass = `ov-stage ${position}${IS_MAC ? " mac-notch" : ""}${IS_MAC && position === "top" ? " docked" : ""}${pasteConfirmed ? " paste-confirmed" : ""}`;
+  const attached =
+    IS_MAC && position === "top" && !!displayLayout?.cameraHeight;
+  const wideCamera =
+    attached && displayLayout.cameraWidth > MAX_CAMERA_WIDTH_FOR_WINGS;
+  const stageClass = [
+    "ov-stage",
+    position,
+    IS_MAC && "mac-notch",
+    IS_MAC && position === "top" && "docked",
+    attached && "attached",
+    wideCamera && "below-camera",
+    pasteConfirmed && "paste-confirmed",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const displayInsets = attached
+    ? ({
+        "--camera-width": `${displayLayout.cameraWidth}px`,
+        "--camera-height": `${displayLayout.cameraHeight}px`,
+      } as React.CSSProperties)
+    : undefined;
 
   // Re-pin when the user is within ~a line of the bottom; unpin otherwise.
   const handleStreamScroll = () => {
@@ -346,16 +387,7 @@ const RecordingOverlay: React.FC = () => {
       }
     >
       <div className="sbase-l">
-        <picture>
-          <source media="(prefers-reduced-motion: reduce)" srcSet={prismMark} />
-          <img
-            className={`smark ${captureReady ? "ready" : "arming"}`}
-            src={IS_MAC && captureReady ? prismNotch : prismMark}
-            width={IS_MAC ? 29 : 22}
-            height={IS_MAC ? 29 : 22}
-            alt=""
-          />
-        </picture>
+        <img className="smark" src={prismMark} width={24} height={24} alt="" />
       </div>
       {waveform}
       <div className="sbase-r">
@@ -417,7 +449,12 @@ const RecordingOverlay: React.FC = () => {
     const collapsed = working && !hasText;
 
     return (
-      <div dir={direction} className={stageClass}>
+      <div
+        dir={direction}
+        className={stageClass}
+        data-animation={animation}
+        style={displayInsets}
+      >
         {noticeProbe}
         <div
           key={session}
@@ -441,7 +478,7 @@ const RecordingOverlay: React.FC = () => {
                     </span>
                   )}
                   {noticeText && <span className="ndetail">{noticeText}</span>}
-                  <LiveTranscript {...streamText} />
+                  <LiveTranscript {...streamText} animation={animation} />
                   {/* Drop the blinking caret once finalizing — it's no longer
                       capturing, and a static spinner conveys the work. */}
                   {!working && !loadingNotice && !liveNotice && (
@@ -477,6 +514,7 @@ const RecordingOverlay: React.FC = () => {
     <div
       dir={direction}
       className={`${stageClass} ov-fade ${isVisible ? "show" : ""}`}
+      style={displayInsets}
     >
       {noticeProbe}
       <div

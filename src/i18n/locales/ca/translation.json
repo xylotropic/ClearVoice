@@ -25,8 +25,6 @@
     "dailyWords": "Paraules: {{words}}",
     "less": "Menys",
     "more": "Més",
-    "estimated": "Estimació",
-    "timeEstimate": "A 150 paraules/min parlant i 50 escrivint.",
     "unavailable": "No s’ha pogut carregar l’activitat.",
     "retry": "Torna-ho a provar"
   },
@@ -533,6 +531,14 @@
         "description": "Mostra la icona del Prism a la safata del sistema."
       },
       "overlay": {
+        "animation": {
+          "title": "Animació del text",
+          "generate": "Aparició gradual",
+          "encrypted": "Xifrat",
+          "sweep": "Escombrada",
+          "typewriter": "Màquina d'escriure",
+          "off": "Desactivada"
+        },
         "style": {
           "title": "Finestra superposada",
           "description": "Tria la finestra superposada d'enregistrament: Cap l'amaga, Mínima mostra un indicador compacte i En directe mostra la transcripció en temps real mentre parleu (només amb models compatibles; cerqueu el distintiu En temps real al selector de models). Al Linux es recomana Cap.",

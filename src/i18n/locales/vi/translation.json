@@ -25,8 +25,6 @@
     "dailyWords": "Số từ: {{words}}",
     "less": "Ít",
     "more": "Nhiều",
-    "estimated": "Ước tính",
-    "timeEstimate": "Dựa trên tốc độ nói 150 từ/phút và gõ 50 từ/phút.",
     "unavailable": "Không tải được hoạt động.",
     "retry": "Thử lại"
   },
@@ -533,6 +531,14 @@
         "description": "Hiển thị biểu tượng Prism trong khay hệ thống."
       },
       "overlay": {
+        "animation": {
+          "title": "Hiệu ứng văn bản",
+          "generate": "Hiện dần từng từ",
+          "encrypted": "Mã hóa",
+          "sweep": "Vệt sáng",
+          "typewriter": "Máy đánh chữ",
+          "off": "Tắt"
+        },
         "style": {
           "title": "Lớp phủ",
           "description": "Chọn lớp phủ khi ghi âm: 'Không có' sẽ ẩn nó, 'Tối giản' hiển thị một chỉ báo nhỏ gọn, 'Trực tiếp' hiển thị bản chép lời theo thời gian thực khi bạn nói (chỉ với các mô hình hỗ trợ truyền trực tiếp — hãy tìm huy hiệu 'Truyền trực tiếp' trong bộ chọn mô hình). Trên Linux, khuyến nghị chọn 'Không có'.",
