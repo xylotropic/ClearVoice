@@ -1,6 +1,6 @@
-use crate::actions::ACTION_MAP;
-use crate::managers::audio::AudioRecordingManager;
-use crate::settings::ShortcutActivation;
+use crate::actions::{transcribe_recovered_recording, ACTION_MAP};
+use crate::managers::audio::{AudioRecordingManager, CancelledRecording};
+use crate::settings::{get_settings, OverlayStyle, ShortcutActivation};
 use log::{debug, error, warn};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -13,6 +13,7 @@ use tauri_specta::Event;
 
 const DEBOUNCE: Duration = Duration::from_millis(30);
 const RELEASE_GRACE: Duration = Duration::from_millis(50);
+const CANCEL_FEEDBACK_HOLD: Duration = Duration::from_secs(5);
 
 /// Recording phase events for windows that follow along (onboarding's Try it).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
@@ -207,8 +208,35 @@ enum Effect {
 /// Commands processed sequentially by the coordinator thread.
 enum Command {
     Input(InputEvent),
-    Cancel { recording_was_active: bool },
+    Cancel {
+        recording_was_active: bool,
+        had_session: bool,
+        recording: Option<CancelledRecording>,
+    },
+    ResolveCancellation {
+        id: u32,
+        undo: bool,
+    },
     ProcessingFinished,
+}
+
+/// Lives on the coordinator thread and drops any audio when the toast expires
+/// or a new take begins. Cancelled audio never reaches the history or model.
+struct CancellationFeedback {
+    id: u32,
+    recording: Option<CancelledRecording>,
+    expires_at: Option<Instant>,
+}
+
+impl CancellationFeedback {
+    fn show(&mut self, app: &AppHandle) {
+        self.expires_at = Some(Instant::now() + CANCEL_FEEDBACK_HOLD);
+        crate::overlay::show_recording_cancelled(app, self.id, self.recording.is_some());
+    }
+
+    fn accepts(&self, id: u32, now: Instant) -> bool {
+        self.id == id && self.expires_at.is_some_and(|expires| now < expires)
+    }
 }
 
 /// Decide whether a key-up should be deferred (so auto-repeat can cancel it)
@@ -592,6 +620,8 @@ impl TranscriptionCoordinator {
         thread::spawn(move || {
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let mut state = CoordinatorState::new();
+                let mut cancellation: Option<CancellationFeedback> = None;
+                let mut cancellation_id = 0u32;
                 // X11 synthesizes key-up/key-down pairs during key repeat.
                 // On macOS a genuine release can reach transcription immediately.
                 #[cfg(target_os = "macos")]
@@ -600,13 +630,34 @@ impl TranscriptionCoordinator {
                 }
 
                 loop {
-                    let cmd = if let Some(deadline) = state.grace_deadline() {
+                    let expiry = cancellation
+                        .as_ref()
+                        .and_then(|feedback| feedback.expires_at);
+                    if expiry.is_some_and(|expires| Instant::now() >= expires) {
+                        cancellation = None;
+                        crate::overlay::hide_recording_overlay(&app);
+                    }
+                    let deadline = state
+                        .grace_deadline()
+                        .into_iter()
+                        .chain(
+                            cancellation
+                                .as_ref()
+                                .and_then(|feedback| feedback.expires_at),
+                        )
+                        .min();
+                    let cmd = if let Some(deadline) = deadline {
                         match rx.recv_timeout(deadline.saturating_duration_since(Instant::now())) {
                             Ok(cmd) => cmd,
                             Err(mpsc::RecvTimeoutError::Timeout) => {
                                 let was_locked = state.is_recording_locked();
-                                if let Some(effect) = state.on_grace_expired() {
-                                    run_effect(&app, &mut state, effect);
+                                if state
+                                    .grace_deadline()
+                                    .is_some_and(|deadline| Instant::now() >= deadline)
+                                {
+                                    if let Some(effect) = state.on_grace_expired() {
+                                        run_effect(&app, &mut state, effect);
+                                    }
                                 }
                                 if !was_locked && state.is_recording_locked() {
                                     emit_recording_phase(&app, RecordingPhase::Locked);
@@ -631,11 +682,16 @@ impl TranscriptionCoordinator {
                             // tap into a hold (#2089).
                             let now = input.received_at;
                             if let Some(effect) = state.on_input(input, now) {
+                                if matches!(effect, Effect::Start { .. }) {
+                                    cancellation = None;
+                                }
                                 run_effect(&app, &mut state, effect);
                             }
                         }
                         Command::Cancel {
                             recording_was_active,
+                            had_session,
+                            recording,
                         } => {
                             // A cancel while transcribing ends the take too.
                             let busy =
@@ -644,10 +700,47 @@ impl TranscriptionCoordinator {
                             if busy {
                                 emit_recording_phase(&app, RecordingPhase::Cancelled);
                             }
+                            cancellation = if had_session
+                                && get_settings(&app).overlay_style != OverlayStyle::None
+                            {
+                                cancellation_id = cancellation_id.wrapping_add(1);
+                                let mut feedback = CancellationFeedback {
+                                    id: cancellation_id,
+                                    recording,
+                                    expires_at: None,
+                                };
+                                if state.stage == Stage::Idle {
+                                    feedback.show(&app);
+                                }
+                                Some(feedback)
+                            } else {
+                                None
+                            };
+                        }
+                        Command::ResolveCancellation { id, undo } => {
+                            if state.stage == Stage::Idle
+                                && cancellation
+                                    .as_ref()
+                                    .is_some_and(|feedback| feedback.accepts(id, Instant::now()))
+                            {
+                                let recording =
+                                    cancellation.take().and_then(|feedback| feedback.recording);
+                                if let (true, Some(recording)) = (undo, recording) {
+                                    state.stage = Stage::Processing;
+                                    transcribe_recovered_recording(&app, recording);
+                                } else {
+                                    crate::overlay::hide_recording_overlay(&app);
+                                }
+                            }
                         }
                         Command::ProcessingFinished => {
                             if let Some(effect) = state.on_processing_finished() {
+                                cancellation = None;
                                 run_effect(&app, &mut state, effect);
+                            } else if let Some(feedback) = &mut cancellation {
+                                if feedback.expires_at.is_none() {
+                                    feedback.show(&app);
+                                }
                             }
                         }
                     }
@@ -724,12 +817,29 @@ impl TranscriptionCoordinator {
         }
     }
 
-    pub fn notify_cancel(&self, recording_was_active: bool) {
+    pub(crate) fn notify_cancel(
+        &self,
+        recording_was_active: bool,
+        had_session: bool,
+        recording: Option<CancelledRecording>,
+    ) {
         if self
             .tx
             .send(Command::Cancel {
                 recording_was_active,
+                had_session,
+                recording,
             })
+            .is_err()
+        {
+            warn!("Transcription coordinator channel closed");
+        }
+    }
+
+    pub(crate) fn resolve_cancellation(&self, id: u32, undo: bool) {
+        if self
+            .tx
+            .send(Command::ResolveCancellation { id, undo })
             .is_err()
         {
             warn!("Transcription coordinator channel closed");
@@ -793,6 +903,21 @@ fn stop(app: &AppHandle, binding_id: &str, hotkey_string: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn recovery_accepts_only_the_current_take_before_expiry() {
+        let now = Instant::now();
+        let mut feedback = CancellationFeedback {
+            id: 25,
+            recording: None,
+            expires_at: None,
+        };
+        assert!(!feedback.accepts(25, now));
+        feedback.expires_at = Some(now + CANCEL_FEEDBACK_HOLD);
+        assert!(feedback.accepts(25, now));
+        assert!(!feedback.accepts(24, now));
+        assert!(!feedback.accepts(25, now + CANCEL_FEEDBACK_HOLD));
+    }
 
     #[test]
     fn push_to_talk_release_while_recording_defers_release() {

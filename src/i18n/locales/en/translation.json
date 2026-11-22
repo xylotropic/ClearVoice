@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Dictation canceled",
+    "undoCancel": "Undo",
     "transcribing": "Transcribing...",
     "processing": "Processing...",
     "loadingModel": "Loading model..."

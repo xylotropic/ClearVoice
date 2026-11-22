@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Dyktowanie anulowane",
+    "undoCancel": "Cofnij",
     "transcribing": "Transkrypcja...",
     "processing": "Przetwarzanie...",
     "loadingModel": "Wczytywanie modelu..."

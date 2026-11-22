@@ -131,6 +131,48 @@ test("the virtual notch stays attached as the live transcript opens", async ({
   }
 });
 
+test("Escape feedback offers Undo for a recoverable take", async ({ page }) => {
+  await page.goto("/src/overlay/index.html");
+  await expect(async () => {
+    await emit(page, "show-overlay", "recording");
+    await expect(page.locator(".scard")).toBeVisible({ timeout: 500 });
+  }).toPass();
+  await emit(page, "overlay-cancelled", { id: 7, canUndo: true });
+  await emit(page, "show-overlay", "cancelled");
+  await expect(page.getByRole("status")).toHaveText("Dictation canceled");
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as Window & { cancellationChoice?: unknown })
+            .cancellationChoice,
+      ),
+    )
+    .toEqual({ id: 7, undo: true });
+
+  await emit(page, "show-overlay", "transcribing");
+  await expect(
+    page.getByRole("button", { name: "Undo", exact: true }),
+  ).toHaveCount(0);
+  await emit(page, "overlay-cancelled", { id: 8, canUndo: false });
+  await emit(page, "show-overlay", "cancelled");
+  await expect(page.getByRole("status")).toHaveText("Dictation canceled");
+  await expect(
+    page.getByRole("button", { name: "Undo", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as Window & { cancellationChoice?: unknown })
+            .cancellationChoice,
+      ),
+    )
+    .toEqual({ id: 8, undo: false });
+});
+
 for (const [option, target, keyframe] of [
   ["encrypted", ".transcript-glyphs", "transcript-decode"],
   ["sweep", ".transcript-word", "transcript-sweep"],
@@ -191,12 +233,18 @@ async function mockOverlay(
       response,
       body:
         `import { mockIPC } from "/node_modules/@tauri-apps/api/mocks.js";
-mockIPC((cmd) => cmd === "get_app_settings" ? {
+mockIPC((cmd, args) => {
+  if (cmd === "resolve_cancellation") {
+    window.cancellationChoice = args;
+    return;
+  }
+  if (cmd === "get_app_settings") return {
   app_language: "en",
   overlay_position: "${position}",
   transcript_animation: ${JSON.stringify(animation)},
   theme: "light"
-} : undefined, { shouldMockEvents: true });
+  };
+}, { shouldMockEvents: true });
 ` + body,
     });
   });

@@ -228,7 +228,7 @@ pub fn cancel_current_operation(app: &AppHandle) {
     let audio_manager = app.state::<Arc<AudioRecordingManager>>();
     let recording_was_active = audio_manager.is_recording();
     let had_session = recording_was_active || crate::tray::dictation_in_progress(app);
-    audio_manager.cancel_recording();
+    let recording = audio_manager.cancel_recording();
     if had_session {
         crate::audio_feedback::play_feedback_sound(app, crate::audio_feedback::SoundType::Cancel);
     }
@@ -250,7 +250,7 @@ pub fn cancel_current_operation(app: &AppHandle) {
 
     // Notify coordinator so it can keep lifecycle state coherent.
     if let Some(coordinator) = app.try_state::<TranscriptionCoordinator>() {
-        coordinator.notify_cancel(recording_was_active);
+        coordinator.notify_cancel(recording_was_active, had_session, recording);
     }
 
     info!("Operation cancellation completed - returned to idle state");

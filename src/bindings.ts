@@ -578,6 +578,9 @@ async showMainWindowCommand() : Promise<Result<null, string>> {
 async cancelOperation() : Promise<void> {
     await TAURI_INVOKE("cancel_operation");
 },
+async resolveCancellation(id: number, undo: boolean) : Promise<void> {
+    await TAURI_INVOKE("resolve_cancellation", { id, undo });
+},
 async isPortable() : Promise<boolean> {
     return await TAURI_INVOKE("is_portable");
 },

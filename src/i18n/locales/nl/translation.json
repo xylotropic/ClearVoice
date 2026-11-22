@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Dicteren geannuleerd",
+    "undoCancel": "Ongedaan maken",
     "transcribing": "Transcriberen...",
     "processing": "Verwerken...",
     "loadingModel": "Model laden..."

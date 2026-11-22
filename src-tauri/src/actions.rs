@@ -701,6 +701,23 @@ impl ShortcutAction for TranscribeAction {
     }
 
     fn stop(&self, app: &AppHandle, binding_id: &str, _shortcut_str: &str) {
+        self.finish(app, binding_id, None);
+    }
+}
+
+pub(crate) fn transcribe_recovered_recording(
+    app: &AppHandle,
+    recording: crate::managers::audio::CancelledRecording,
+) {
+    RECORDING_SESSION.fetch_add(1, Ordering::SeqCst);
+    TranscribeAction {
+        post_process: recording.binding_id == "transcribe_with_post_process",
+    }
+    .finish(app, &recording.binding_id, Some(recording.samples));
+}
+
+impl TranscribeAction {
+    fn finish(&self, app: &AppHandle, binding_id: &str, recovered: Option<Vec<f32>>) {
         // Prevent a slow microphone from emitting a ready event or start chime
         // after the user has already requested stop.
         app.state::<Arc<AudioRecordingManager>>()
@@ -729,7 +746,8 @@ impl ShortcutAction for TranscribeAction {
             || settings.history_limit > 0;
         // Capture this before finalizing the stream so every later working state
         // targets the same overlay that was shown for this transcription.
-        let use_streaming_overlay = should_use_streaming_overlay(style, tm.is_streaming());
+        let use_streaming_overlay =
+            recovered.is_none() && should_use_streaming_overlay(style, tm.is_streaming());
         if use_streaming_overlay {
             tm.emit_stream_working(StreamWorkKind::Transcribing);
         } else {
@@ -739,8 +757,9 @@ impl ShortcutAction for TranscribeAction {
         // Unmute before playing audio feedback so the stop sound is audible
         rm.remove_mute();
 
-        // Play audio feedback for recording stop
-        play_feedback_sound(app, SoundType::Stop);
+        if recovered.is_none() {
+            play_feedback_sound(app, SoundType::Stop);
+        }
 
         let binding_id = binding_id.to_string(); // Clone binding_id for the async task
         let post_process = self.post_process;
@@ -754,7 +773,8 @@ impl ShortcutAction for TranscribeAction {
             );
 
             let stop_recording_time = Instant::now();
-            if let Some(samples) = rm.stop_recording(&binding_id, cancel_generation) {
+            let samples = recovered.or_else(|| rm.stop_recording(&binding_id, cancel_generation));
+            if let Some(samples) = samples {
                 // Read now: by the time transcribing ends, another take may
                 // have replaced it.
                 let input_silent = rm.last_input_silent();

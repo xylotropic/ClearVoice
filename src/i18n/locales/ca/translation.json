@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Dictat cancel·lat",
+    "undoCancel": "Desfés",
     "transcribing": "S'està transcrivint...",
     "processing": "S'està processant...",
     "loadingModel": "S'està carregant el model..."

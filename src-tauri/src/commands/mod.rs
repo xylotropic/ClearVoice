@@ -18,6 +18,13 @@ pub fn cancel_operation(app: AppHandle) {
 
 #[tauri::command]
 #[specta::specta]
+pub fn resolve_cancellation(app: AppHandle, id: u32, undo: bool) {
+    app.state::<crate::TranscriptionCoordinator>()
+        .resolve_cancellation(id, undo);
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn is_portable() -> bool {
     crate::portable::is_portable()
 }

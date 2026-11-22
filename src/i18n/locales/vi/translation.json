@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Đã hủy đọc chính tả",
+    "undoCancel": "Hoàn tác",
     "transcribing": "Đang chuyển đổi...",
     "processing": "Đang xử lý...",
     "loadingModel": "Đang tải mô hình..."

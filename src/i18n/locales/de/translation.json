@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Diktat abgebrochen",
+    "undoCancel": "Rückgängig",
     "transcribing": "Transkribiere...",
     "processing": "Verarbeite...",
     "loadingModel": "Modell wird geladen..."

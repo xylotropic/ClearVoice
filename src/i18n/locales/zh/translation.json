@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "听写已取消",
+    "undoCancel": "撤销",
     "transcribing": "正在转录...",
     "processing": "处理中...",
     "loadingModel": "正在加载模型..."

@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Diktering avbruten",
+    "undoCancel": "Ångra",
     "transcribing": "Transkriberar...",
     "processing": "Bearbetar...",
     "loadingModel": "Laddar modell..."

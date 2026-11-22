@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Dikte iptal edildi",
+    "undoCancel": "Geri al",
     "transcribing": "Transkribe ediliyor...",
     "processing": "İşleniyor...",
     "loadingModel": "Model yükleniyor..."

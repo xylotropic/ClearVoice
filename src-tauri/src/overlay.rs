@@ -71,6 +71,7 @@ const OVERLAY_STREAM_HEIGHT: f64 = 120.0;
 
 const NOTICE_STATE: &str = "notice";
 const LIVE_NOTICE_STATE: &str = "live_notice";
+const CANCELLED_STATE: &str = "cancelled";
 
 /// How long a notice holds before the overlay fades it.
 const NOTICE_HOLD: Duration = Duration::from_secs(4);
@@ -91,7 +92,7 @@ fn notice_state(session_is_live: bool) -> &'static str {
 
 /// Overlay window size (logical) for a given UI state.
 fn overlay_dimensions(state: &str) -> (f64, f64) {
-    if is_live_state(state) {
+    if is_live_state(state) || state == CANCELLED_STATE {
         (OVERLAY_STREAM_WIDTH, OVERLAY_STREAM_HEIGHT)
     } else {
         (OVERLAY_WIDTH, OVERLAY_HEIGHT)
@@ -789,6 +790,22 @@ pub fn show_transcribing_overlay(app_handle: &AppHandle) {
 /// Shows the processing overlay window
 pub fn show_processing_overlay(app_handle: &AppHandle) {
     show_overlay_state(app_handle, "processing");
+}
+
+/// Confirm Escape in the same non-activating panel used for dictation.
+pub(crate) fn show_recording_cancelled(app: &AppHandle, id: u32, can_undo: bool) {
+    if !OVERLAY_ENABLED.load(Ordering::Relaxed) {
+        return;
+    }
+    let handle = app.clone();
+    let _ = app.run_on_main_thread(move || {
+        let _ = handle.emit_to(
+            "recording_overlay",
+            "overlay-cancelled",
+            serde_json::json!({ "id": id, "canUndo": can_undo }),
+        );
+        show_overlay_state_on_main(&handle, CANCELLED_STATE);
+    });
 }
 
 /// Shows `notice` in place of the session's overlay and fades it after

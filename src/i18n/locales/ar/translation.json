@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "أُلغي الإملاء",
+    "undoCancel": "تراجع",
     "transcribing": "جاري التفريغ...",
     "processing": "جاري المعالجة...",
     "loadingModel": "جارٍ تحميل النموذج..."

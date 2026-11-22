@@ -1,4 +1,5 @@
 import { listen } from "@tauri-apps/api/event";
+import { Undo2, X } from "lucide-react";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./RecordingOverlay.css";
@@ -19,11 +20,17 @@ import { noticeDisplay } from "@/lib/notices";
 import type { ModelStateEvent } from "@/lib/types/events";
 import { getLanguageDirection } from "@/lib/utils/rtl";
 
+interface Cancellation {
+  id: number;
+  canUndo: boolean;
+}
+
 type OverlayState =
   | "recording"
   | "streaming"
   | "transcribing"
   | "processing"
+  | "cancelled"
   | "notice"
   | "live_notice";
 
@@ -97,6 +104,7 @@ const RecordingOverlay: React.FC = () => {
   // while overflowing, so the resting first line stays crisp flush under the pill.
   const [overflowing, setOverflowing] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [cancellation, setCancellation] = useState<Cancellation | null>(null);
   const [pasteConfirmed, setPasteConfirmed] = useState(false);
   const [noticeWidth, setNoticeWidth] = useState<number>();
   const noticeProbeRef = useRef<HTMLSpanElement>(null);
@@ -117,6 +125,11 @@ const RecordingOverlay: React.FC = () => {
         setNotice(event.payload);
       });
 
+      const unlistenCancellation = await listen<Cancellation>(
+        "overlay-cancelled",
+        ({ payload }) => setCancellation(payload),
+      );
+
       const unlistenLayout = await listen<OverlayDisplayLayout>(
         "overlay-display-layout",
         ({ payload }) => {
@@ -130,6 +143,7 @@ const RecordingOverlay: React.FC = () => {
         clearTimeout(fadeTimerRef.current);
         setPasteConfirmed(false);
         if (!isNoticeState(overlayState)) setNotice(null);
+        if (overlayState !== "cancelled") setCancellation(null);
         // Reset synchronously before settings I/O. A fast microphone can emit
         // recording-ready while the awaits below are in flight; resetting after
         // them would overwrite that event and leave the overlay stuck arming.
@@ -240,6 +254,7 @@ const RecordingOverlay: React.FC = () => {
 
       return () => {
         unlistenNotice();
+        unlistenCancellation();
         unlistenLayout();
         unlistenShow();
         unlistenHide();
@@ -424,6 +439,41 @@ const RecordingOverlay: React.FC = () => {
   const dismissNotice = shownNotice
     ? () => commands.dismissOverlayNotice()
     : undefined;
+
+  if (state === "cancelled" && cancellation) {
+    const resolve = (undo: boolean) =>
+      commands.resolveCancellation(cancellation.id, undo);
+    return (
+      <div
+        className={`${stageClass} ov-fade ${isVisible ? "show" : ""}`}
+        dir={direction}
+        style={displayInsets}
+      >
+        <div className="cancel-toast">
+          <img src={prismMark} alt="" width={24} height={24} />
+          <span className="cancel-toast-title" role="status">
+            {t("overlay.cancelled")}
+          </span>
+          {cancellation.canUndo && (
+            <button
+              className="cancel-toast-undo"
+              onClick={() => void resolve(true)}
+            >
+              <Undo2 aria-hidden="true" size={14} />
+              {t("overlay.undoCancel")}
+            </button>
+          )}
+          <button
+            className="cancel-toast-dismiss"
+            aria-label={t("common.close")}
+            onClick={() => void resolve(false)}
+          >
+            <X aria-hidden="true" size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ---- Live overlay: a pill that sculpts open into a panel ----
   const liveNotice = state === "live_notice" ? shownNotice : null;

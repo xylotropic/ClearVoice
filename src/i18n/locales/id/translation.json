@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Dikte dibatalkan",
+    "undoCancel": "Urungkan",
     "transcribing": "Mentranskripsikan...",
     "processing": "Memproses...",
     "loadingModel": "Memuat model..."

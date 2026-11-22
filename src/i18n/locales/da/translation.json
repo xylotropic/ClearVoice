@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Diktering annulleret",
+    "undoCancel": "Fortryd",
     "transcribing": "Transskriberer...",
     "processing": "Behandler...",
     "loadingModel": "Indlæser model..."

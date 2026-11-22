@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Диктовка отменена",
+    "undoCancel": "Отменить",
     "transcribing": "Расшифровка...",
     "processing": "Обработка...",
     "loadingModel": "Загрузка модели..."

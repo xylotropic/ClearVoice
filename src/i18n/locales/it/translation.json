@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "Dettatura annullata",
+    "undoCancel": "Ripristina",
     "transcribing": "Trascrizione...",
     "processing": "Elaborazione...",
     "loadingModel": "Caricamento del modello..."

@@ -515,6 +515,18 @@ pub struct AudioRecordingManager {
     last_input_silent: Arc<AtomicBool>,
 }
 
+pub(crate) struct CancelledRecording {
+    pub(crate) binding_id: String,
+    pub(crate) samples: Vec<f32>,
+}
+
+fn pad_recording(mut samples: Vec<f32>) -> Vec<f32> {
+    if !samples.is_empty() && samples.len() < WHISPER_SAMPLE_RATE {
+        samples.resize(WHISPER_SAMPLE_RATE * 5 / 4, 0.0);
+    }
+    samples
+}
+
 impl AudioRecordingManager {
     /* ---------- construction ------------------------------------------------ */
 
@@ -1300,16 +1312,7 @@ impl AudioRecordingManager {
                     return None;
                 }
 
-                // Pad if very short
-                let s_len = samples.len();
-                // debug!("Got {} samples", s_len);
-                if s_len < WHISPER_SAMPLE_RATE && s_len > 0 {
-                    let mut padded = samples;
-                    padded.resize(WHISPER_SAMPLE_RATE * 5 / 4, 0.0);
-                    Some(padded)
-                } else {
-                    Some(samples)
-                }
+                Some(pad_recording(samples))
             }
             _ => None,
         }
@@ -1323,20 +1326,25 @@ impl AudioRecordingManager {
         self.recording_active.load(Ordering::SeqCst)
     }
 
-    /// Cancel any ongoing recording without returning audio samples
-    pub fn cancel_recording(&self) {
+    /// Stop immediately and hand any captured samples to the cancellation flow.
+    pub(crate) fn cancel_recording(&self) -> Option<CancelledRecording> {
         self.invalidate_recording_readiness();
         self.cancel_generation.fetch_add(1, Ordering::AcqRel);
         let mut state = self.state.lock().unwrap();
 
         match *state {
-            RecordingState::Recording { .. } => {
+            RecordingState::Recording { ref binding_id } => {
+                let binding_id = binding_id.clone();
                 self.set_state(&mut state, RecordingState::Idle);
                 drop(state);
 
-                if let Some(microphone) = self.recorder.lock().unwrap().as_ref() {
-                    let _ = self.collect_recording(microphone); // Discard the result
-                }
+                let samples = self
+                    .recorder
+                    .lock()
+                    .unwrap()
+                    .as_ref()
+                    .map(|microphone| self.collect_recording(microphone))
+                    .unwrap_or_default();
 
                 *self.is_recording.lock().unwrap() = false;
 
@@ -1348,11 +1356,16 @@ impl AudioRecordingManager {
                         self.stop_microphone_stream();
                     }
                 }
+                (!samples.is_empty()).then(|| CancelledRecording {
+                    binding_id,
+                    samples: pad_recording(samples),
+                })
             }
             RecordingState::Stopping => {
                 debug!("Cancellation requested while recording is stopping");
+                None
             }
-            RecordingState::Idle => {}
+            RecordingState::Idle => None,
         }
     }
 }

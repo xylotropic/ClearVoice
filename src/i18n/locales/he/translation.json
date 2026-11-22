@@ -1012,6 +1012,8 @@
     }
   },
   "overlay": {
+    "cancelled": "ההכתבה בוטלה",
+    "undoCancel": "ביטול",
     "transcribing": "מתמלל...",
     "processing": "מעבד...",
     "loadingModel": "טוען מודל..."
